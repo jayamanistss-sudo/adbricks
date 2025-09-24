@@ -37,18 +37,8 @@ const Navbar = ({ setShowLoginModal, setShowPostPropertyModal, generalStatsdata 
   };
 
   const handleNavClick = (e, href) => {
-    if (!user && href === "/properties") {
-      e.preventDefault();
-      setShowLoginModal(true);
-      return;
-    }
-    if (href.startsWith("#")) {
-      setActiveHash(href);
-      window.location.hash = href;
-    }
-    setMenuOpen(false); // close sidebar on mobile
+    window.location.hash = href;
   };
-
   const links = [
     { href: "#home", label: "Home", icon: "fas fa-home" },
     { href: "/properties", label: "Properties", icon: "fas fa-building" },
@@ -74,8 +64,8 @@ const Navbar = ({ setShowLoginModal, setShowPostPropertyModal, generalStatsdata 
                     ? { background: "#3498db", color: "white" }
                     : {}
                   : isActive
-                  ? { borderBottom: "2px solid #f39c12" }
-                  : {}),
+                    ? { borderBottom: "2px solid #f39c12" }
+                    : {}),
               }}
             >
               <i className={icon}></i> {label}
@@ -100,26 +90,6 @@ const Navbar = ({ setShowLoginModal, setShowPostPropertyModal, generalStatsdata 
         </li>
       ) : (
         <>
-          <li>
-            <a
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                setShowPostPropertyModal(true);
-                setMenuOpen(false);
-              }}
-              style={{
-                ...navLinkStyle,
-                background: "#f39c12",
-                color: "#2c3e50",
-                padding: "8px 20px",
-                borderRadius: "25px",
-                fontWeight: "bold",
-              }}
-            >
-              <i className="fas fa-plus"></i> Post
-            </a>
-          </li>
           <li>
             <a href="/profile" style={navLinkStyle}>
               <i className="fas fa-user"></i> Profile
@@ -172,7 +142,7 @@ const Navbar = ({ setShowLoginModal, setShowPostPropertyModal, generalStatsdata 
           {/* Logo */}
           <a href="#home" style={{ display: "flex", alignItems: "center", gap: "10px" }}>
             {navData.logo_url ? (
-              <img src={navData.logo_url} alt={navData.site_name} style={{ height: "40px", borderRadius: "6px" }} />
+              <img src={navData.logo_url} alt={navData.site_name} style={{ height: "21px", borderRadius: "6px" }} />
             ) : (
               <i className="fas fa-home" style={{ color: "white", fontSize: "1.8rem" }} />
             )}
@@ -238,10 +208,14 @@ const navLinkStyle = {
   padding: "8px 16px",
   borderRadius: "20px",
   transition: "all 0.3s ease",
-  display: "flex",
+  display: "inline-flex",
   alignItems: "center",
-  gap: "6px",
+  justifyContent: "center",
+  gap: "8px",
+  lineHeight: "1.5",
+  verticalAlign: "middle",
 };
+
 
 const hamburgerLine = {
   width: "25px",

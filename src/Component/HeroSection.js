@@ -55,7 +55,6 @@ const HeroSection = ({ registeredUser }) => {
   }, [selectedDistrict]);
 
   const handleSearch = () => {
-    if (user) {
       const params = new URLSearchParams();
       if (activeTab) {
         params.append("is_resale", activeTab === "new" ? "0" : "1");
@@ -64,9 +63,6 @@ const HeroSection = ({ registeredUser }) => {
       if (selectedCity) params.append("city", selectedCity);
       if (budgetRange) params.append("budget", budgetRange);
       window.location.href = `/properties?${params.toString()}`;
-    } else {
-      setShowLoginModal(true);
-    }
   };
 
   const handleViewContact = () => {
