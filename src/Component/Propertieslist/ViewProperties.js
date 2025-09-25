@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import api from '../Apiurl';
 import LoginModal from "../LoginModal";
 import RegisterModal from "../RegisterModal";
+
 const PropertiesPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -128,6 +129,8 @@ const PropertiesPage = () => {
       setDistricts([]);
       setBrandStore([]);
       setPropertyTypes([]);
+    } finally {
+      setLoading(false);
     }
   }, [apiUrl]);
 
@@ -272,9 +275,7 @@ const PropertiesPage = () => {
   }, [propertyList]);
 
   useEffect(() => {
-    setLoading(true);
     setProperties(transformedProperties);
-    setLoading(false);
   }, [transformedProperties]);
 
   const handleFilterChange = useCallback((filterType, value) => {
@@ -385,6 +386,7 @@ const PropertiesPage = () => {
         return null;
     }
   }, []);
+
   useEffect(() => {
     const storedUser = localStorage.getItem("userDetails");
     if (storedUser) {
@@ -395,23 +397,40 @@ const PropertiesPage = () => {
       }
     }
   }, []);
+
   const handlePropertyClick = useCallback((propertyId) => {
     if (user) {
       window.location.href = `/propertiesDetails/${propertyId}`;
     } else {
       setShowLoginModal(true);
     }
-  }, []);
+  }, [user]);
+
+  const handleBack = () => {
+    window.history.length > 1 ? navigate(-1) : navigate('/');
+  };
 
   if (loading) {
     return (
-      <div className="loading-container">
-        <div className="loading-spinner"></div>
-        <p>Loading properties...</p>
+      <div className="loading-overlay">
+        <div className="loader">
+          <div className="spinner"></div>
+          <p>Loading Properties...</p>
+        </div>
         <style jsx>{`
-          .loading-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
-          .loading-spinner { width: 50px; height: 50px; border: 4px solid rgba(255,255,255,0.3); border-top: 4px solid white; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
+          .loading-overlay { 
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0; 
+            background: rgba(255,255,255,0.95); display: flex; 
+            align-items: center; justify-content: center; z-index: 9999;
+          }
+          .loader { text-align: center; }
+          .spinner { 
+            width: 40px; height: 40px; margin: 0 auto 16px;
+            border: 3px solid #f3f3f3; border-top: 3px solid #3498db; 
+            border-radius: 50%; animation: spin 1s linear infinite; 
+          }
           @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+          .loader p { color: #666; font-size: 14px; }
         `}</style>
       </div>
     );
@@ -451,6 +470,25 @@ const PropertiesPage = () => {
           bottom: 0;
           background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
           opacity: 0.3;
+        }
+        .back-button {
+          position: absolute;
+          top: 20px;
+          left: 20px;
+          background: rgba(255,255,255,0.2);
+          border: none;
+          color: white;
+          padding: 8px 16px;
+          border-radius: 20px;
+          cursor: pointer;
+          font-size: 14px;
+          font-weight: 500;
+          transition: all 0.3s ease;
+          z-index: 2;
+        }
+        .back-button:hover {
+          background: rgba(255,255,255,0.3);
+          transform: translateX(-2px);
         }
         .header h1 { font-size: 2.2rem; margin-bottom: 12px; font-weight: 800; position: relative; z-index: 1; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
         .header p { opacity: 0.9; font-size: 1.1rem; position: relative; z-index: 1; }
@@ -891,9 +929,12 @@ const PropertiesPage = () => {
           .spec { font-size: 0.75rem; padding: 3px 8px; }
           .badge { font-size: 0.65rem; padding: 3px 8px; }
         }
-      `}</style>
+        `}</style>
 
         <div className="header">
+          <button className="back-button" onClick={handleBack}>
+            ← Back
+          </button>
           <h1>Properties in {districts.find(d => d.district_id === filters.district)?.district_name || 'All Locations'}</h1>
           <p>{filteredProperties.length} premium properties found</p>
         </div>
