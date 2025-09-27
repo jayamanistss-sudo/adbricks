@@ -4,6 +4,7 @@ export const useResponsive = () => {
   const getBreakpoint = (width) => {
     if (width < 768) return "mobile";
     if (width < 1024) return "tablet";
+    if (width < 1246) return "smallLaptop";
     return "desktop";
   };
 

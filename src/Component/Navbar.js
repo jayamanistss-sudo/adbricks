@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useResponsive } from "../hooks";
 
 const Navbar = ({ setShowLoginModal, setShowPostPropertyModal, generalStatsdata }) => {
   const navData = generalStatsdata?.data?.[0] || {};
@@ -6,7 +7,7 @@ const Navbar = ({ setShowLoginModal, setShowPostPropertyModal, generalStatsdata 
   const [isScrolled, setIsScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeHash, setActiveHash] = useState(window.location.hash || "#home");
-
+  const breakpoint = useResponsive();
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
     window.addEventListener("scroll", handleScroll);
@@ -64,8 +65,8 @@ const Navbar = ({ setShowLoginModal, setShowPostPropertyModal, generalStatsdata 
                     ? { background: "#3498db", color: "white" }
                     : {}
                   : isActive
-                    ? { borderBottom: "2px solid #f39c12" }
-                    : {}),
+                  ? { borderBottom: "2px solid #f39c12" }
+                  : {}),
               }}
             >
               <i className={icon}></i> {label}
@@ -131,18 +132,23 @@ const Navbar = ({ setShowLoginModal, setShowPostPropertyModal, generalStatsdata 
         backdropFilter: isScrolled ? "blur(10px)" : "none",
       }}
     >
-      <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 20px" }}>
+      <div style={{ margin: "0 auto", padding: "0 20px" }}>
         <div
           style={{
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
+            width: "100%",
           }}
         >
           {/* Logo */}
           <a href="#home" style={{ display: "flex", alignItems: "center", gap: "10px" }}>
             {navData.logo_url ? (
-              <img src={navData.logo_url} alt={navData.site_name} style={{ height: "21px", borderRadius: "6px" }} />
+              <img
+                src={navData.logo_url}
+                alt={navData.site_name}
+                style={{ height: breakpoint === "mobile" ? "50px" : "60px", borderRadius: "6px" }}
+              />
             ) : (
               <i className="fas fa-home" style={{ color: "white", fontSize: "1.8rem" }} />
             )}
@@ -154,10 +160,11 @@ const Navbar = ({ setShowLoginModal, setShowPostPropertyModal, generalStatsdata 
             style={{
               display: "flex",
               listStyle: "none",
-              gap: "20px",
+              gap: breakpoint === "smallLaptop" ? "10px" : "20px",
               alignItems: "center",
               margin: 0,
               padding: 0,
+              width: breakpoint === "smallLaptop" ? "100%" : "70%",
             }}
           >
             <NavLinks />
@@ -215,7 +222,6 @@ const navLinkStyle = {
   lineHeight: "1.5",
   verticalAlign: "middle",
 };
-
 
 const hamburgerLine = {
   width: "25px",
