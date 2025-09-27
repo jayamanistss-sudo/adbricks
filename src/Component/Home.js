@@ -28,7 +28,6 @@ export default function Home() {
     const [generalStatsdata, setGeneralStats] = useState([]);
     const [propertyList, setPropertyList] = useState([]);
     const statsRef = useRef(null);
-    // const api = "https://demo.stss.in/admin/Config/router.php?router=";
     const api = "https://demo.stss.in/admin/Config/router.php?router=";
 
     useEffect(() => {
