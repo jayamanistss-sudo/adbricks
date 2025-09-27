@@ -8,14 +8,20 @@ const Footer = ({ data }) => {
   const contactInfo = [
     { icon: "map-marker-alt", text: siteData.contact_address || "Chennai, Tamil Nadu" },
     { icon: "phone", text: siteData.contact_phone || "+91 98765 43210" },
-    { icon: "envelope", text: siteData.contact_email || "info@Adbricks.com" }
+    { icon: "envelope", text: siteData.contact_email || "info@Adbricks.com" },
   ];
 
   const socialLinks = [
     { icon: "facebook-f", href: "#" },
     { icon: "twitter", href: "#" },
     { icon: "instagram", href: "#" },
-    { icon: "linkedin-in", href: "#" }
+    { icon: "linkedin-in", href: "#" },
+  ];
+
+  const links = [
+    { href: "/#home", label: "Home", icon: "fas fa-home" },
+    { href: "/#about", label: "About", icon: "fas fa-info-circle" },
+    { href: "/properties", label: "Properties", icon: "fas fa-building" },
   ];
 
   return (
@@ -32,7 +38,13 @@ const Footer = ({ data }) => {
                 <a
                   key={index}
                   href={social.href}
-                  style={{ display: "inline-block", marginRight: "15px", color: "white", fontSize: "1.2rem", textDecoration: "none" }}
+                  style={{
+                    display: "inline-block",
+                    marginRight: "15px",
+                    color: "white",
+                    fontSize: "1.2rem",
+                    textDecoration: "none",
+                  }}
                 >
                   <i className={`fab fa-${social.icon}`}></i>
                 </a>
@@ -50,39 +62,123 @@ const Footer = ({ data }) => {
               ))}
             </ul>
           </div>
+          <div>
+            <h5 style={{ color: "#f39c12", marginBottom: "20px" }}>Quick Links</h5>
+            <ul style={{ listStyle: "none", padding: 0 }}>
+              {links.map((link, index) => {
+                return (
+                  <li key={index}>
+                    <a
+                      href={link.href}
+                      
+                      style={navLinkStyle}
+                    >
+                      <i className={`${link.icon}`}></i> {link.label}
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
         </div>
 
-        <div style={{ marginTop: "40px", paddingTop: "20px", borderTop: "1px solid #34495e", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div
+          style={{
+            marginTop: "40px",
+            paddingTop: "20px",
+            borderTop: "1px solid #34495e",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
           <p style={{ margin: 0 }}>&copy; 2025 {siteData.site_name || "Adbricks.com"}. All rights reserved.</p>
           <div>
-            <span onClick={() => setShowPrivacy(true)} style={{ color: "white", cursor: "pointer", marginLeft: "20px" }}>Privacy Policy *</span>
-            <span onClick={() => setShowTerms(true)} style={{ color: "white", cursor: "pointer", marginLeft: "20px" }}>Terms of Service *</span>
+            <span
+              onClick={() => setShowPrivacy(true)}
+              style={{ color: "white", cursor: "pointer", marginLeft: "20px" }}
+            >
+              Privacy Policy *
+            </span>
+            <span onClick={() => setShowTerms(true)} style={{ color: "white", cursor: "pointer", marginLeft: "20px" }}>
+              Terms of Service *
+            </span>
           </div>
         </div>
       </div>
 
       {showPrivacy && (
-        <div style={{
-          position: "fixed", top: 0, left: 0, width: "100%", height: "100%",
-          background: "rgba(0,0,0,0.7)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 9999
-        }}>
-          <div style={{ background: "white", padding: "30px", borderRadius: "12px", maxWidth: "700px", width: "90%", maxHeight: "90%", overflowY: "auto" }}>
-            <h2 style={{color:"black"}}>Privacy Policy</h2>
-            <p style={{color:"black"}}>{siteData.privacy_policy}</p>
-            <button onClick={() => setShowPrivacy(false)} style={{ marginTop: "20px", padding: "10px 20px", cursor: "pointer" }}>Close</button>
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            background: "rgba(0,0,0,0.7)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 9999,
+          }}
+        >
+          <div
+            style={{
+              background: "white",
+              padding: "30px",
+              borderRadius: "12px",
+              maxWidth: "700px",
+              width: "90%",
+              maxHeight: "90%",
+              overflowY: "auto",
+            }}
+          >
+            <h2 style={{ color: "black" }}>Privacy Policy</h2>
+            <p style={{ color: "black" }}>{siteData.privacy_policy}</p>
+            <button
+              onClick={() => setShowPrivacy(false)}
+              style={{ marginTop: "20px", padding: "10px 20px", cursor: "pointer" }}
+            >
+              Close
+            </button>
           </div>
         </div>
       )}
 
       {showTerms && (
-        <div style={{
-          position: "fixed", top: 0, left: 0, width: "100%", height: "100%",
-          background: "rgba(0,0,0,0.7)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 9999
-        }}>
-          <div style={{ background: "white", padding: "30px", borderRadius: "12px", maxWidth: "700px", width: "90%", maxHeight: "90%", overflowY: "auto" }}>
-            <h2 style={{color:"black"}}>Terms of Service</h2>
-            <p style={{color:"black"}}>{siteData.terms_of_service}</p>
-            <button onClick={() => setShowTerms(false)} style={{ marginTop: "20px", padding: "10px 20px", cursor: "pointer" }}>Close</button>
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            background: "rgba(0,0,0,0.7)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 9999,
+          }}
+        >
+          <div
+            style={{
+              background: "white",
+              padding: "30px",
+              borderRadius: "12px",
+              maxWidth: "700px",
+              width: "90%",
+              maxHeight: "90%",
+              overflowY: "auto",
+            }}
+          >
+            <h2 style={{ color: "black" }}>Terms of Service</h2>
+            <p style={{ color: "black" }}>{siteData.terms_of_service}</p>
+            <button
+              onClick={() => setShowTerms(false)}
+              style={{ marginTop: "20px", padding: "10px 20px", cursor: "pointer" }}
+            >
+              Close
+            </button>
           </div>
         </div>
       )}
@@ -93,3 +189,18 @@ const Footer = ({ data }) => {
 };
 
 export default Footer;
+
+const navLinkStyle = {
+  color: "white",
+  textDecoration: "none",
+  fontWeight: "500",
+  padding: "8px 8px",
+  borderRadius: "20px",
+  transition: "all 0.3s ease",
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: "8px",
+  lineHeight: "1.5",
+  verticalAlign: "middle",
+};
