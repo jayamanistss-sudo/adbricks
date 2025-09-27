@@ -1086,10 +1086,10 @@ const PropertyDetailsPage = () => {
             <div className="contact-card">
               <h3>Interested in this property?</h3>
               <button className="btn-primary" onClick={() => setShowContactForm(true)}>
-                Contact Owner
+                Mssage Owner
               </button>
               <button className="btn-secondary" onClick={() => window.open(`tel:${property.contact_number}`)}>
-                📞 Call Now
+                📞 {property.contact_number}
               </button>
             </div>
 
