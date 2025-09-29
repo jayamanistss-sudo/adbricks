@@ -6,10 +6,9 @@ const PropertyShowcase = ({ data }) => {
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const [imageSlides, setImageSlides] = useState({});
   const [imageErrors, setImageErrors] = useState(new Set());
-  const [showLoginModal, setShowLoginModal] = useState(false);
-  const [showRegisterModal, setShowRegisterModal] = useState(false);
-  const [user, setUser] = useState(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
 
   const properties = React.useMemo(() => {
     return (data?.data || [])
@@ -18,10 +17,7 @@ const PropertyShowcase = ({ data }) => {
   }, [data]);
 
   useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-    
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
@@ -39,25 +35,12 @@ const PropertyShowcase = ({ data }) => {
 
   useEffect(() => {
     if (!isAutoPlaying || properties.length <= 1) return;
-
     const timer = setInterval(() => navigate(1), 5000);
     return () => clearInterval(timer);
   }, [isAutoPlaying, properties.length, navigate]);
 
-  useEffect(() => {
-    const storedUser = localStorage.getItem("userDetails");
-    if (storedUser) {
-      try {
-        setUser(JSON.parse(storedUser));
-      } catch {
-        setUser(null);
-      }
-    }
-  }, []);
-
   const getVisibleCards = useCallback(() => {
     if (!properties.length) return [];
-
     const cardsToShow = isMobile ? 1 : Math.min(3, properties.length);
     return [...Array(cardsToShow)].map((_, i) => ({
       ...properties[(currentSlide + i) % properties.length],
@@ -67,22 +50,15 @@ const PropertyShowcase = ({ data }) => {
 
   const getPropertyImages = useCallback((property) => {
     const images = [];
-
-    if (property.image_url?.trim()) {
-      images.push(property.image_url);
-    }
-
+    if (property.image_url?.trim()) images.push(property.image_url);
     if (property.additional_images) {
       try {
         const additional = JSON.parse(property.additional_images);
         if (Array.isArray(additional)) {
           images.push(...additional.filter(img => img?.trim()));
         }
-      } catch (e) {
-        console.warn('Failed to parse additional_images:', e);
-      }
+      } catch {}
     }
-
     return images;
   }, []);
 
@@ -91,22 +67,32 @@ const PropertyShowcase = ({ data }) => {
   }, []);
 
   const handleView = useCallback((id) => {
-    if (user) {
-      window.location.href = `/propertiesDetails/${id}`;
-    } else {
-      setShowLoginModal(true);
+    window.location.href = `/propertiesDetails/${id}`;
+  }, []);
+
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+    
+    if (isLeftSwipe) {
+      navigate(1);
+    } else if (isRightSwipe) {
+      navigate(-1);
     }
-  }, [user]);
-
-  const handleShowRegister = useCallback(() => {
-    setShowLoginModal(false);
-    setShowRegisterModal(true);
-  }, []);
-
-  const handleShowLogin = useCallback(() => {
-    setShowRegisterModal(false);
-    setShowLoginModal(true);
-  }, []);
+  };
 
   const PropertyCard = React.memo(({ property }) => {
     const images = getPropertyImages(property);
@@ -126,33 +112,16 @@ const PropertyShowcase = ({ data }) => {
       <div
         style={{
           background: 'rgba(255, 255, 255, 0.98)',
-          borderRadius: isMobile ? '16px' : '20px',
+          borderRadius: isMobile ? '20px' : '20px',
           overflow: 'hidden',
-          boxShadow: '0 20px 40px rgba(0,0,0,0.15)',
+          boxShadow: isMobile ? '0 10px 30px rgba(0,0,0,0.12)' : '0 20px 40px rgba(0,0,0,0.15)',
           transition: 'all 0.3s ease',
           minWidth: isMobile ? '100%' : '380px',
           maxWidth: isMobile ? '100%' : '420px',
-          cursor: 'pointer',
-          transform: 'scale(1)',
-        }}
-        onMouseEnter={(e) => {
-          if (!isMobile) {
-            e.currentTarget.style.transform = 'scale(1.02)';
-            e.currentTarget.style.boxShadow = '0 25px 50px rgba(0,0,0,0.2)';
-          }
-        }}
-        onMouseLeave={(e) => {
-          if (!isMobile) {
-            e.currentTarget.style.transform = 'scale(1)';
-            e.currentTarget.style.boxShadow = '0 20px 40px rgba(0,0,0,0.15)';
-          }
+          cursor: 'pointer'
         }}
       >
-        <div style={{ 
-          height: isMobile ? '240px' : '280px', 
-          position: 'relative', 
-          background: '#f8fafc' 
-        }}>
+        <div style={{ height: isMobile ? '280px' : '280px', position: 'relative', background: '#f8fafc' }}>
           {images.length > 0 && (
             <>
               {!imageErrors.has(`${property.property_id}-${currentImageIndex}`) ? (
@@ -160,62 +129,32 @@ const PropertyShowcase = ({ data }) => {
                   src={images[currentImageIndex]}
                   alt={`${property.property_type_name} - ${property.bhk_configuration}`}
                   onError={() => handleImageError(property.property_id, currentImageIndex)}
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                    objectPosition: 'center'
-                  }}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
                 />
               ) : (
                 <div style={{
-                  width: '100%',
-                  height: '100%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
+                  width: '100%', height: '100%',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
                   background: 'linear-gradient(135deg, #e2e8f0, #cbd5e1)',
-                  color: '#64748b',
-                  fontSize: isMobile ? '1.5rem' : '2rem',
-                  fontWeight: '600'
+                  color: '#64748b', fontSize: '2rem', fontWeight: '600'
                 }}>
-                  <Home size={isMobile ? 36 : 48} />
+                  <Home size={48} />
                 </div>
               )}
-
-              <div style={{
-                position: 'absolute',
-                bottom: 0,
-                left: 0,
-                right: 0,
-                height: '60px',
-                background: 'linear-gradient(transparent, rgba(0,0,0,0.6))'
-              }} />
+              <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '80px', background: 'linear-gradient(transparent, rgba(0,0,0,0.7))' }} />
             </>
           )}
 
           <div style={{
-            position: 'absolute',
-            bottom: '15px',
-            left: isMobile ? '15px' : '20px',
-            background: 'rgba(44, 62, 80, 0.9)',
-            color: 'white',
-            padding: isMobile ? '6px 10px' : '8px 12px',
-            borderRadius: '20px',
-            fontSize: isMobile ? '0.75rem' : '0.85rem',
-            fontWeight: '600',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '5px',
-            backdropFilter: 'blur(10px)',
-            maxWidth: 'calc(100% - 30px)'
+            position: 'absolute', bottom: isMobile ? '12px' : '15px', left: isMobile ? '12px' : '20px',
+            background: 'rgba(44, 62, 80, 0.95)', color: 'white',
+            padding: isMobile ? '8px 14px' : '8px 12px', borderRadius: '24px',
+            fontSize: isMobile ? '0.85rem' : '0.85rem', fontWeight: '600',
+            display: 'flex', alignItems: 'center', gap: '6px', backdropFilter: 'blur(10px)',
+            maxWidth: 'calc(100% - 24px)'
           }}>
-            <MapPin size={isMobile ? 12 : 14} />
-            <span style={{ 
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis'
-            }}>
+            <MapPin size={isMobile ? 14 : 14} />
+            <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               {property.city_name}, {property.district_name}
             </span>
           </div>
@@ -225,92 +164,50 @@ const PropertyShowcase = ({ data }) => {
               <button
                 onClick={(e) => handleImageNavigation(e, -1)}
                 style={{
-                  position: 'absolute',
-                  left: '10px',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  background: 'rgba(255, 255, 255, 0.9)',
-                  border: 'none',
-                  borderRadius: '50%',
-                  width: isMobile ? '30px' : '35px',
-                  height: isMobile ? '30px' : '35px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                  zIndex: 10
-                }}
-                onMouseEnter={(e) => {
-                  if (!isMobile) {
-                    e.currentTarget.style.background = 'rgba(255, 255, 255, 1)';
-                    e.currentTarget.style.transform = 'translateY(-50%) scale(1.1)';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!isMobile) {
-                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.9)';
-                    e.currentTarget.style.transform = 'translateY(-50%) scale(1)';
-                  }
+                  position: 'absolute', left: isMobile ? '12px' : '10px', top: '50%', transform: 'translateY(-50%)',
+                  background: 'rgba(255, 255, 255, 0.95)', border: 'none', borderRadius: '50%',
+                  width: isMobile ? '36px' : '35px', height: isMobile ? '36px' : '35px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 10,
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
                 }}
               >
-                <ChevronLeft size={isMobile ? 16 : 18} color="rgb(44, 62, 80)" />
+                <ChevronLeft size={isMobile ? 18 : 18} color="rgb(44, 62, 80)" />
               </button>
 
               <button
                 onClick={(e) => handleImageNavigation(e, 1)}
                 style={{
-                  position: 'absolute',
-                  right: '10px',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  background: 'rgba(255, 255, 255, 0.9)',
-                  border: 'none',
-                  borderRadius: '50%',
-                  width: isMobile ? '30px' : '35px',
-                  height: isMobile ? '30px' : '35px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                  zIndex: 10
-                }}
-                onMouseEnter={(e) => {
-                  if (!isMobile) {
-                    e.currentTarget.style.background = 'rgba(255, 255, 255, 1)';
-                    e.currentTarget.style.transform = 'translateY(-50%) scale(1.1)';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!isMobile) {
-                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.9)';
-                    e.currentTarget.style.transform = 'translateY(-50%) scale(1)';
-                  }
+                  position: 'absolute', right: isMobile ? '12px' : '10px', top: '50%', transform: 'translateY(-50%)',
+                  background: 'rgba(255, 255, 255, 0.95)', border: 'none', borderRadius: '50%',
+                  width: isMobile ? '36px' : '35px', height: isMobile ? '36px' : '35px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 10,
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
                 }}
               >
-                <ChevronRight size={isMobile ? 16 : 18} color="rgb(44, 62, 80)" />
+                <ChevronRight size={isMobile ? 18 : 18} color="rgb(44, 62, 80)" />
               </button>
 
-              <div style={{
-                position: 'absolute',
-                bottom: '10px',
-                right: isMobile ? '15px' : '20px',
-                display: 'flex',
-                gap: isMobile ? '3px' : '5px'
+              <div style={{ 
+                position: 'absolute', 
+                bottom: isMobile ? '12px' : '10px', 
+                right: isMobile ? '12px' : '20px', 
+                display: 'flex', 
+                gap: isMobile ? '6px' : '5px',
+                background: 'rgba(0, 0, 0, 0.4)',
+                padding: isMobile ? '6px 10px' : '4px 8px',
+                borderRadius: '12px',
+                backdropFilter: 'blur(8px)'
               }}>
                 {images.map((_, index) => (
                   <div
                     key={index}
                     style={{
-                      width: isMobile ? '6px' : '8px',
-                      height: isMobile ? '6px' : '8px',
-                      borderRadius: '50%',
-                      background: index === currentImageIndex
-                        ? 'rgba(255, 255, 255, 0.9)'
-                        : 'rgba(255, 255, 255, 0.5)',
+                      width: isMobile ? '7px' : '8px', 
+                      height: isMobile ? '7px' : '8px',
+                      borderRadius: '50%', 
+                      background: index === currentImageIndex ? 'rgba(255, 255, 255, 0.95)' : 'rgba(255, 255, 255, 0.4)', 
                       cursor: 'pointer',
-                      transition: 'all 0.2s ease'
+                      transition: 'all 0.3s ease'
                     }}
                     onClick={(e) => handleDotClick(e, index)}
                   />
@@ -320,77 +217,84 @@ const PropertyShowcase = ({ data }) => {
           )}
         </div>
 
-        <div style={{ 
-          padding: isMobile ? '20px' : '25px', 
-          color: '#1a365d' 
-        }}>
-          <div style={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            gap: '8px', 
-            marginBottom: '8px' 
-          }}>
-            <Home size={isMobile ? 16 : 18} color="rgb(52, 152, 219)" />
-            <h3 style={{
-              fontSize: isMobile ? '1.1rem' : '1.3rem',
-              fontWeight: '700',
-              margin: 0,
-              lineHeight: '1.3'
+        <div style={{ padding: isMobile ? '24px 20px' : '25px', color: '#1a365d' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
+            <Home size={isMobile ? 18 : 18} color="rgb(52, 152, 219)" />
+            <h3 style={{ 
+              fontSize: isMobile ? '1.25rem' : '1.3rem', 
+              fontWeight: '700', 
+              margin: 0, 
+              lineHeight: '1.3',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap'
             }}>
               {property.property_name}
             </h3>
           </div>
 
-          <div
-            style={{
-              fontSize: isMobile ? "1.2rem" : "1.4rem",
-              fontWeight: "800",
-              color: "rgb(52, 152, 219)",
-              marginBottom: "20px",
-            }}
-          >
-            Per sq ft ₹{parseFloat(property.price_per_sqft || 0).toLocaleString("en-IN")}
+          <div style={{ 
+            fontSize: isMobile ? "1.4rem" : "1.4rem", 
+            fontWeight: "800", 
+            color: "rgb(52, 152, 219)", 
+            marginBottom: isMobile ? "24px" : "20px",
+            letterSpacing: '-0.02em'
+          }}>
+            ₹{parseFloat(property.price_per_sqft || 0).toLocaleString("en-IN")}/sq ft
           </div>
 
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: isMobile ? '12px' : '15px',
-            marginBottom: '20px',
-            fontSize: isMobile ? '0.8rem' : '0.9rem'
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: '1fr 1fr', 
+            gap: isMobile ? '16px' : '15px', 
+            marginBottom: isMobile ? '24px' : '20px', 
+            fontSize: isMobile ? '0.85rem' : '0.9rem' 
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Square size={14} color="#64748b" />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{
+                background: 'rgba(52, 152, 219, 0.1)',
+                borderRadius: '8px',
+                padding: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <Square size={isMobile ? 16 : 14} color="rgb(52, 152, 219)" />
+              </div>
               <div>
-                <div style={{ color: '#64748b', fontSize: isMobile ? '0.7rem' : '0.8rem' }}>BHK</div>
-                <div style={{ fontWeight: '600', color: '#1a365d' }}>
+                <div style={{ color: '#64748b', fontSize: isMobile ? '0.75rem' : '0.8rem', marginBottom: '2px' }}>BHK</div>
+                <div style={{ fontWeight: '700', color: '#1a365d', fontSize: isMobile ? '0.9rem' : '0.85rem' }}>
                   {(() => {
                     let bhks = property.bhk_configuration;
                     if (typeof bhks === "string") {
-                      try {
-                        bhks = JSON.parse(bhks);
-                      } catch {
-                        bhks = [bhks];
-                      }
+                      try { bhks = JSON.parse(bhks); } catch { bhks = [bhks]; }
                     }
-                    if (!Array.isArray(bhks)) {
-                      bhks = bhks ? [bhks] : [];
-                    }
+                    if (!Array.isArray(bhks)) bhks = bhks ? [bhks] : [];
                     return bhks.length > 0 ? bhks.join(", ") : "N/A";
                   })()}
                 </div>
               </div>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <User size={14} color="#64748b" />
-              <div>
-                <div style={{ color: '#64748b', fontSize: isMobile ? '0.7rem' : '0.8rem' }}>Owner</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{
+                background: 'rgba(52, 152, 219, 0.1)',
+                borderRadius: '8px',
+                padding: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <User size={isMobile ? 16 : 14} color="rgb(52, 152, 219)" />
+              </div>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ color: '#64748b', fontSize: isMobile ? '0.75rem' : '0.8rem', marginBottom: '2px' }}>Owner</div>
                 <div style={{ 
-                  fontWeight: '600', 
-                  color: '#1a365d',
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis'
+                  fontWeight: '700', 
+                  color: '#1a365d', 
+                  whiteSpace: 'nowrap', 
+                  overflow: 'hidden', 
+                  textOverflow: 'ellipsis',
+                  fontSize: isMobile ? '0.9rem' : '0.85rem'
                 }}>
                   {property.owner_name || 'N/A'}
                 </div>
@@ -401,29 +305,21 @@ const PropertyShowcase = ({ data }) => {
           <button
             style={{
               background: 'linear-gradient(135deg, rgb(44, 62, 80), rgb(52, 152, 219))',
-              border: 'none',
-              padding: isMobile ? '12px 20px' : '14px 24px',
-              borderRadius: '25px',
-              fontWeight: '700',
+              border: 'none', 
+              padding: isMobile ? '16px 24px' : '14px 24px',
+              borderRadius: '30px', 
+              fontWeight: '700', 
               color: 'white',
-              cursor: 'pointer',
-              width: '100%',
-              fontSize: isMobile ? '0.9rem' : '0.95rem',
-              transition: 'all 0.3s ease'
+              cursor: 'pointer', 
+              width: '100%', 
+              fontSize: isMobile ? '1rem' : '0.95rem',
+              boxShadow: '0 4px 12px rgba(52, 152, 219, 0.3)',
+              transition: 'transform 0.2s ease',
+              letterSpacing: '0.02em'
             }}
             onClick={() => handleView(property.property_id)}
-            onMouseEnter={(e) => {
-              if (!isMobile) {
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = '0 8px 20px rgba(52, 152, 219, 0.3)';
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (!isMobile) {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = 'none';
-              }
-            }}
+            onTouchStart={(e) => e.currentTarget.style.transform = 'scale(0.98)'}
+            onTouchEnd={(e) => e.currentTarget.style.transform = 'scale(1)'}
           >
             View Details
           </button>
@@ -434,74 +330,78 @@ const PropertyShowcase = ({ data }) => {
 
   return (
     <section
-      style={{
-        padding: isMobile ? '60px 0' : '100px 0',
-        background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
-        position: 'relative'
+      style={{ 
+        padding: isMobile ? '50px 0 60px' : '100px 0', 
+        background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)', 
+        position: 'relative',
+        minHeight: isMobile ? '100vh' : 'auto'
       }}
       onMouseEnter={() => !isMobile && setIsAutoPlaying(false)}
       onMouseLeave={() => !isMobile && setIsAutoPlaying(true)}
+      onTouchStart={isMobile ? onTouchStart : undefined}
+      onTouchMove={isMobile ? onTouchMove : undefined}
+      onTouchEnd={isMobile ? onTouchEnd : undefined}
     >
       <div style={{ 
         maxWidth: '1400px', 
         margin: '0 auto', 
-        padding: isMobile ? '0 15px' : '0 20px' 
+        padding: isMobile ? '0 20px' : '0 20px' 
       }}>
-        <div style={{ 
-          textAlign: 'center', 
-          marginBottom: isMobile ? '40px' : '60px' 
-        }}>
+        <div style={{ textAlign: 'center', marginBottom: isMobile ? '36px' : '60px' }}>
           <h2 style={{
-            fontSize: isMobile ? '2rem' : '3rem',
-            marginBottom: '15px',
+            fontSize: isMobile ? '2.2rem' : '3rem', 
+            marginBottom: isMobile ? '12px' : '15px', 
             fontWeight: '800',
             background: 'linear-gradient(135deg, rgb(44, 62, 80), rgb(52, 152, 219))',
-            WebkitBackgroundClip: 'text',
+            WebkitBackgroundClip: 'text', 
             WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text'
+            lineHeight: '1.2',
+            letterSpacing: '-0.02em'
           }}>
             Premium Properties
           </h2>
           <p style={{
-            fontSize: isMobile ? '1rem' : '1.2rem',
+            fontSize: isMobile ? '1.05rem' : '1.2rem', 
             color: '#64748b',
-            maxWidth: '600px',
-            margin: '0 auto',
+            maxWidth: '600px', 
+            margin: '0 auto', 
             lineHeight: '1.6',
-            padding: isMobile ? '0 20px' : '0'
+            padding: isMobile ? '0 10px' : '0'
           }}>
             Discover exceptional properties from our handpicked premium collection
           </p>
         </div>
 
         {!properties.length ? (
-          <div style={{
-            textAlign: 'center',
-            color: '#64748b',
-            fontSize: isMobile ? '1rem' : '1.2rem',
-            padding: isMobile ? '40px 20px' : '60px',
-            background: 'rgba(255, 255, 255, 0.8)',
-            borderRadius: '20px'
+          <div style={{ 
+            textAlign: 'center', 
+            color: '#64748b', 
+            fontSize: isMobile ? '1.05rem' : '1.2rem', 
+            padding: isMobile ? '50px 20px' : '60px', 
+            background: 'rgba(255, 255, 255, 0.8)', 
+            borderRadius: isMobile ? '16px' : '20px',
+            margin: isMobile ? '0 10px' : '0'
           }}>
             No premium properties available
           </div>
         ) : (
           <div style={{ position: 'relative' }}>
             <div style={{
-              display: 'flex',
-              gap: isMobile ? '20px' : '30px',
+              display: 'flex', 
+              gap: isMobile ? '0' : '30px', 
               justifyContent: 'center',
-              alignItems: 'stretch',
-              overflowX: isMobile ? 'auto' : 'visible',
-              scrollSnapType: isMobile ? 'x mandatory' : 'none',
-              paddingBottom: isMobile ? '10px' : '0'
+              alignItems: 'stretch', 
+              overflowX: isMobile ? 'visible' : 'visible',
+              scrollSnapType: 'none',
+              paddingBottom: isMobile ? '20px' : '0'
             }}>
               {getVisibleCards().map((property, index) => (
-                <div
-                  key={`${property.property_id}-${currentSlide}-${index}`}
-                  style={{
-                    scrollSnapAlign: isMobile ? 'center' : 'none',
-                    flexShrink: isMobile ? 0 : 1
+                <div 
+                  key={`${property.property_id}-${currentSlide}-${index}`} 
+                  style={{ 
+                    scrollSnapAlign: 'none',
+                    flexShrink: isMobile ? 0 : 1,
+                    width: isMobile ? '100%' : 'auto'
                   }}
                 >
                   <PropertyCard property={property} />
@@ -514,36 +414,25 @@ const PropertyShowcase = ({ data }) => {
                 <button
                   onClick={() => navigate(-1)}
                   style={{
-                    position: 'absolute',
-                    left: isMobile ? '10px' : '-80px',
-                    top: '50%',
+                    position: 'absolute', 
+                    left: isMobile ? '-10px' : '-80px', 
+                    top: '50%', 
                     transform: 'translateY(-50%)',
-                    background: 'rgba(255, 255, 255, 0.95)',
+                    background: 'rgba(255, 255, 255, 0.98)', 
                     border: '2px solid rgba(52, 152, 219, 0.2)',
-                    borderRadius: '50%',
-                    width: isMobile ? '50px' : '70px',
-                    height: isMobile ? '50px' : '70px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                    transition: 'all 0.3s ease',
-                    zIndex: 10
+                    borderRadius: '50%', 
+                    width: isMobile ? '44px' : '70px', 
+                    height: isMobile ? '44px' : '70px',
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center', 
+                    cursor: 'pointer', 
+                    zIndex: 10,
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                    transition: 'all 0.2s ease'
                   }}
-                  onMouseEnter={(e) => {
-                    if (!isMobile) {
-                      e.currentTarget.style.background = 'rgba(255, 255, 255, 1)';
-                      e.currentTarget.style.borderColor = 'rgba(52, 152, 219, 0.5)';
-                      e.currentTarget.style.transform = 'translateY(-50%) scale(1.1)';
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!isMobile) {
-                      e.currentTarget.style.background = 'rgba(255, 255, 255, 0.95)';
-                      e.currentTarget.style.borderColor = 'rgba(52, 152, 219, 0.2)';
-                      e.currentTarget.style.transform = 'translateY(-50%) scale(1)';
-                    }
-                  }}
+                  onTouchStart={(e) => e.currentTarget.style.transform = 'translateY(-50%) scale(0.95)'}
+                  onTouchEnd={(e) => e.currentTarget.style.transform = 'translateY(-50%) scale(1)'}
                 >
                   <ChevronLeft size={isMobile ? 20 : 28} color="rgb(44, 62, 80)" />
                 </button>
@@ -551,39 +440,52 @@ const PropertyShowcase = ({ data }) => {
                 <button
                   onClick={() => navigate(1)}
                   style={{
-                    position: 'absolute',
-                    right: isMobile ? '10px' : '-80px',
-                    top: '50%',
+                    position: 'absolute', 
+                    right: isMobile ? '-10px' : '-80px', 
+                    top: '50%', 
                     transform: 'translateY(-50%)',
-                    background: 'rgba(255, 255, 255, 0.95)',
+                    background: 'rgba(255, 255, 255, 0.98)', 
                     border: '2px solid rgba(52, 152, 219, 0.2)',
-                    borderRadius: '50%',
-                    width: isMobile ? '50px' : '70px',
-                    height: isMobile ? '50px' : '70px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                    transition: 'all 0.3s ease',
-                    zIndex: 10
+                    borderRadius: '50%', 
+                    width: isMobile ? '44px' : '70px', 
+                    height: isMobile ? '44px' : '70px',
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center', 
+                    cursor: 'pointer', 
+                    zIndex: 10,
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                    transition: 'all 0.2s ease'
                   }}
-                  onMouseEnter={(e) => {
-                    if (!isMobile) {
-                      e.currentTarget.style.background = 'rgba(255, 255, 255, 1)';
-                      e.currentTarget.style.borderColor = 'rgba(52, 152, 219, 0.5)';
-                      e.currentTarget.style.transform = 'translateY(-50%) scale(1.1)';
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!isMobile) {
-                      e.currentTarget.style.background = 'rgba(255, 255, 255, 0.95)';
-                      e.currentTarget.style.borderColor = 'rgba(52, 152, 219, 0.2)';
-                      e.currentTarget.style.transform = 'translateY(-50%) scale(1)';
-                    }
-                  }}
+                  onTouchStart={(e) => e.currentTarget.style.transform = 'translateY(-50%) scale(0.95)'}
+                  onTouchEnd={(e) => e.currentTarget.style.transform = 'translateY(-50%) scale(1)'}
                 >
                   <ChevronRight size={isMobile ? 20 : 28} color="rgb(44, 62, 80)" />
                 </button>
+
+                {isMobile && (
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    marginTop: '24px'
+                  }}>
+                    {properties.map((_, index) => (
+                      <div
+                        key={index}
+                        onClick={() => setCurrentSlide(index)}
+                        style={{
+                          width: index === currentSlide ? '24px' : '8px',
+                          height: '8px',
+                          borderRadius: '4px',
+                          background: index === currentSlide ? 'rgb(52, 152, 219)' : 'rgba(52, 152, 219, 0.3)',
+                          cursor: 'pointer',
+                          transition: 'all 0.3s ease'
+                        }}
+                      />
+                    ))}
+                  </div>
+                )}
               </>
             )}
           </div>

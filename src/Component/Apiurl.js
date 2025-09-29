@@ -15,20 +15,19 @@ const api = async (param, method = "GET", body = null, isFormData = false) => {
 
     const response = await fetch(`${BASE_URL}${param}`, options);
 
-    if (!response.ok) {
-      const errorText = await response.text(); // get server error text
-      throw new Error(`API error: ${response.status} - ${errorText}`);
-    }
-
     const contentType = response.headers.get("content-type");
+    let result;
+
     if (contentType && contentType.includes("application/json")) {
-      return await response.json();
+      result = await response.json();
     } else {
-      return await response.text();
+      result = await response.text();
     }
+    return result; 
+
   } catch (err) {
     console.error("API Error:", err);
-    throw err;
+    return { status: 500, ok: false, data: err.message };
   }
 };
 

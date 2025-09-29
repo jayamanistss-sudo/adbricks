@@ -1,16 +1,18 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const api = "https://demo.stss.in/admin/Config/router.php?router=";
 
 const InteriorDesignSection = () => {
   const [providers, setProviders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetch(`${api}interior_providers`)
       .then((res) => res.json())
       .then((data) => {
-        setProviders(data.data); // expecting API returns array with keys: name, logo, services, timeline, priceRange, phone, email, gradient
+        setProviders(data.data);
         setLoading(false);
       })
       .catch((err) => {
@@ -26,7 +28,27 @@ const InteriorDesignSection = () => {
   return (
     <section style={{ padding: "100px 20px", background: "#4585b2", minHeight: "100vh" }}>
       <div style={{ maxWidth: "1400px", margin: "0 auto" }}>
-        {/* Header */}
+        <button
+          onClick={() => navigate(-1)}
+          style={{
+            background: "white",
+            border: "none",
+            padding: "10px 20px",
+            borderRadius: "10px",
+            fontSize: "1rem",
+            fontWeight: "600",
+            color: "#4585b2",
+            cursor: "pointer",
+            marginBottom: "30px",
+            boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
+            transition: "all 0.3s ease"
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.background = "#f1f1f1")}
+          onMouseLeave={(e) => (e.currentTarget.style.background = "white")}
+        >
+          ← Back
+        </button>
+
         <div style={{ textAlign: "center", marginBottom: "80px" }}>
           <h1 style={{ fontSize: "3.5rem", fontWeight: "900", color: "white", marginBottom: "20px" }}>
             Premium Home Interior Providers
@@ -36,7 +58,6 @@ const InteriorDesignSection = () => {
           </p>
         </div>
 
-        {/* Providers Grid */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(380px, 1fr))", gap: "30px" }}>
           {providers.map((provider, index) => (
             <div
@@ -67,7 +88,6 @@ const InteriorDesignSection = () => {
                 }}
               ></div>
 
-              {/* Logo and Name */}
               <div style={{ display: "flex", alignItems: "center", gap: "20px", marginBottom: "30px", position: "relative", zIndex: "1" }}>
                 <div
                   style={{
@@ -90,7 +110,6 @@ const InteriorDesignSection = () => {
                 </div>
               </div>
 
-              {/* Timeline & Price */}
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "25px", marginBottom: "30px" }}>
                 <div style={{ padding: "20px", background: "rgba(255,255,255,0.7)", borderRadius: "16px" }}>
                   <div style={{ fontSize: "0.9rem", color: "#718096", fontWeight: "600", marginBottom: "8px" }}>Timeline</div>
@@ -102,7 +121,6 @@ const InteriorDesignSection = () => {
                 </div>
               </div>
 
-              {/* Contact */}
               <div style={{ borderTop: "2px solid rgba(0,0,0,0.08)", paddingTop: "25px" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "12px", padding: "12px 0" }}>
                   <i className="fas fa-phone-alt" style={{ color: "#667eea", fontSize: "1rem" }}></i>
@@ -117,15 +135,12 @@ const InteriorDesignSection = () => {
           ))}
         </div>
 
-        {/* Footer Note */}
         <div style={{ textAlign: "center", marginTop: "60px", padding: "30px", background: "rgba(255,255,255,0.1)", borderRadius: "20px" }}>
           <p style={{ color: "rgba(255,255,255,0.9)", fontSize: "1.1rem", margin: "0" }}>
             ✨ Prices and timelines may vary depending on project size, materials, and customization. Always consult providers for exact quotes.
           </p>
         </div>
       </div>
-
-      {/* FontAwesome CDN */}
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     </section>
   );

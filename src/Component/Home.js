@@ -374,7 +374,7 @@ export default function Home() {
                 showBHKSelector={showBHKSelector}
             />
             <FeaturesSection />
-            <StatsSection ref={statsRef} animatedStats={animatedStats} />
+            {/* <StatsSection ref={statsRef} animatedStats={animatedStats} /> */}
             <BrandStoreSection data={brandStore} />
             <PropertyShowcase data={propertyList} />
             <PropertiesSection data={propertyList} />

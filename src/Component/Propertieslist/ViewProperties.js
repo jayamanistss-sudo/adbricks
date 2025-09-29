@@ -15,7 +15,7 @@ const PropertiesPage = () => {
     bhk: [],
     district: '',
     city: '',
-    priceRange: { min: '', max: '' },
+    budgetRange: '', // Changed from priceRange to budgetRange
     areaRange: { min: '', max: '' },
     verified: false,
     newLaunch: false,
@@ -32,6 +32,8 @@ const PropertiesPage = () => {
   const [propertyTypes, setPropertyTypes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
+  const [relatedProperties, setRelatedProperties] = useState([]);
+  const [showRelated, setShowRelated] = useState(false);
   const propertiesPerPage = 12;
   const apiUrl = "https://demo.stss.in/admin/Config/router.php?router=";
   const [user, setUser] = useState(null);
@@ -41,33 +43,102 @@ const PropertiesPage = () => {
   const parseBudgetRange = useCallback((budget) => {
     if (!budget) return { min: '', max: '' };
 
-    if (budget === '50L-1Cr') return { min: '50', max: '100' };
-    if (budget === '1Cr-2Cr') return { min: '100', max: '200' };
-    if (budget === '2Cr-5Cr') return { min: '200', max: '500' };
-    if (budget === '5Cr+') return { min: '500', max: '' };
+    switch (budget) {
+      case '20L-50L': return { min: '20', max: '50' };
+      case '50L-1Cr': return { min: '50', max: '100' };
+      case '1Cr-2Cr': return { min: '100', max: '200' };
+      case '2Cr+': return { min: '200', max: '' };
+      default: return { min: '', max: '' };
+    }
+  }, []);
 
-    if (budget.includes('L-') || budget.includes('Cr-') || budget.includes('L+') || budget.includes('Cr+')) {
-      const parts = budget.replace(/L|Cr/g, '').split('-');
-      if (parts.length === 2) {
-        const minValue = parseFloat(parts[0]) || '';
-        const maxValue = parseFloat(parts[1]) || '';
-        if (budget.includes('L')) {
-          return { min: minValue.toString(), max: maxValue.toString() };
-        } else if (budget.includes('Cr')) {
-          return { min: (minValue * 100).toString(), max: (maxValue * 100).toString() };
+  // Function to find related properties based on filters
+  const findRelatedProperties = useCallback((allProperties, currentFilters) => {
+    const related = [];
+    const priceRange = parseBudgetRange(currentFilters.budgetRange);
+
+    // Helper function to check if values are within tolerance
+    const isWithinTolerance = (value, target, tolerance = 0.2) => {
+      if (!target || target === '') return false;
+      const targetNum = parseFloat(target);
+      const valueNum = parseFloat(value);
+      return Math.abs(valueNum - targetNum) <= targetNum * tolerance;
+    };
+
+    // Helper function to check BHK similarity
+    const isBhkSimilar = (propertyBhks, filterBhks) => {
+      if (filterBhks.length === 0) return false;
+      return propertyBhks.some(propBhk => {
+        return filterBhks.some(filterBhk => {
+          const propNum = parseInt(propBhk);
+          const filterNum = parseInt(filterBhk);
+          if (filterBhk === '5+') return propNum >= 4; // Show 4+ BHK for 5+ filter
+          return Math.abs(propNum - filterNum) <= 1; // Allow ±1 BHK difference
+        });
+      });
+    };
+
+    allProperties.forEach(property => {
+      let relevanceScore = 0;
+      let isRelated = false;
+
+      // BHK Configuration similarity
+      if (currentFilters.bhk.length > 0 && isBhkSimilar(property.bhkArray, currentFilters.bhk)) {
+        relevanceScore += 3;
+        isRelated = true;
+      }
+
+      // Price Range similarity (within 20% tolerance)
+      if (priceRange.min || priceRange.max) {
+        const propertyPriceInLakhs = property.price / 100000;
+        if (priceRange.min && isWithinTolerance(propertyPriceInLakhs, priceRange.min, 0.3)) {
+          relevanceScore += 2;
+          isRelated = true;
         }
-      } else if (budget.includes('+')) {
-        const minValue = parseFloat(parts[0]) || '';
-        if (budget.includes('L+')) {
-          return { min: minValue.toString(), max: '' };
-        } else if (budget.includes('Cr+')) {
-          return { min: (minValue * 100).toString(), max: '' };
+        if (priceRange.max && isWithinTolerance(propertyPriceInLakhs, priceRange.max, 0.3)) {
+          relevanceScore += 2;
+          isRelated = true;
         }
       }
-    }
 
-    return { min: '', max: '' };
-  }, []);
+      // Area Range similarity (within 20% tolerance)
+      if (currentFilters.areaRange.min || currentFilters.areaRange.max) {
+        if (currentFilters.areaRange.min && isWithinTolerance(property.area, currentFilters.areaRange.min, 0.25)) {
+          relevanceScore += 2;
+          isRelated = true;
+        }
+        if (currentFilters.areaRange.max && isWithinTolerance(property.area, currentFilters.areaRange.max, 0.25)) {
+          relevanceScore += 2;
+          isRelated = true;
+        }
+      }
+
+      // Location similarity
+      if (currentFilters.district && property.districtId === currentFilters.district) {
+        relevanceScore += 1;
+        isRelated = true;
+      }
+      if (currentFilters.city && property.cityId === currentFilters.city) {
+        relevanceScore += 1;
+        isRelated = true;
+      }
+
+      // Property type similarity
+      if (currentFilters.propertyType !== 'all' && property.type === currentFilters.propertyType) {
+        relevanceScore += 1;
+        isRelated = true;
+      }
+
+      if (isRelated) {
+        related.push({ ...property, relevanceScore });
+      }
+    });
+
+    // Sort by relevance score and return top 12
+    return related
+      .sort((a, b) => b.relevanceScore - a.relevanceScore)
+      .slice(0, 12);
+  }, [parseBudgetRange]);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
@@ -82,17 +153,15 @@ const PropertiesPage = () => {
       isResale = isResaleParam === '1';
     }
 
-    const priceRange = parseBudgetRange(budget);
-
     setFilters(prev => ({
       ...prev,
       district,
       city,
       isResale: isResaleParam !== null ? isResale : prev.isResale,
-      priceRange,
+      budgetRange: budget, // Use budgetRange instead of priceRange
       brandType
     }));
-  }, [location.search, parseBudgetRange]);
+  }, [location.search]);
 
   const fetchInitialData = useCallback(async () => {
     try {
@@ -286,7 +355,7 @@ const PropertiesPage = () => {
           : [...prev.bhk, value];
         return { ...prev, bhk: updatedArray };
       }
-      if (filterType === 'priceRange' || filterType === 'areaRange') {
+      if (filterType === 'areaRange') {
         return { ...prev, [filterType]: { ...prev[filterType], ...value } };
       }
       return { ...prev, [filterType]: value };
@@ -315,8 +384,16 @@ const PropertiesPage = () => {
 
       if (filters.district && filters.district !== '' && p.districtId !== filters.district) return false;
       if (filters.city && filters.city !== '' && p.cityId !== filters.city) return false;
-      if (filters.priceRange.min && filters.priceRange.min !== '' && p.price < parseInt(filters.priceRange.min) * 100000) return false;
-      if (filters.priceRange.max && filters.priceRange.max !== '' && p.price > parseInt(filters.priceRange.max) * 100000) return false;
+
+      // Updated price filtering logic for budget range
+      if (filters.budgetRange) {
+        const priceRange = parseBudgetRange(filters.budgetRange);
+        if (priceRange.min) priceRange.min = Number(priceRange.min) * 0.5;
+        if (priceRange.max) priceRange.max = Number(priceRange.max) * 1.25;
+        if (priceRange.min && p.price < priceRange.min * 100000) return false;
+        if (priceRange.max && p.price > priceRange.max * 100000) return false;
+      }
+
       if (filters.areaRange.min && filters.areaRange.min !== '' && p.area < parseInt(filters.areaRange.min)) return false;
       if (filters.areaRange.max && filters.areaRange.max !== '' && p.area > parseInt(filters.areaRange.max)) return false;
       if (filters.verified && !p.verified) return false;
@@ -324,7 +401,7 @@ const PropertiesPage = () => {
       if (filters.isResale !== undefined && filters.isResale !== false && p.isResale !== filters.isResale) return false;
       return true;
     });
-  }, [filters]);
+  }, [filters, parseBudgetRange]);
 
   const sortProperties = useCallback((list) => {
     return [...list].sort((a, b) => {
@@ -345,6 +422,19 @@ const PropertiesPage = () => {
 
   const filteredProperties = useMemo(() => applyFilters(properties), [applyFilters, properties]);
   const sortedProperties = useMemo(() => sortProperties(filteredProperties), [sortProperties, filteredProperties]);
+
+  // Update related properties when filters or properties change
+  useEffect(() => {
+    if (filteredProperties.length === 0 && properties.length > 0) {
+      const related = findRelatedProperties(properties, filters);
+      setRelatedProperties(related);
+      setShowRelated(related.length > 0);
+    } else {
+      setShowRelated(false);
+      setRelatedProperties([]);
+    }
+  }, [filteredProperties, properties, filters, findRelatedProperties]);
+
   const totalPages = Math.ceil(sortedProperties.length / propertiesPerPage);
   const currentProperties = useMemo(() =>
     sortedProperties.slice((currentPage - 1) * propertiesPerPage, currentPage * propertiesPerPage),
@@ -359,7 +449,7 @@ const PropertiesPage = () => {
       bhk: [],
       district: '',
       city: '',
-      priceRange: { min: '', max: '' },
+      budgetRange: '', // Changed from priceRange
       areaRange: { min: '', max: '' },
       verified: false,
       newLaunch: false,
@@ -409,6 +499,64 @@ const PropertiesPage = () => {
   const handleBack = () => {
     window.history.length > 1 ? navigate(-1) : navigate('/');
   };
+
+  const renderPropertyCard = useCallback((property, isRelated = false) => {
+    const priorityBadge = getPriorityBadge(property.priority);
+    return (
+      <div key={property.id} className="card" onClick={() => handlePropertyClick(property.id)}>
+        <div className="card-image" style={{ backgroundImage: property.image ? `url(${property.image})` : 'none' }}>
+          <div className="badges">
+            {priorityBadge && (
+              <span className={`badge ${priorityBadge.class}`}>
+                {priorityBadge.icon} {priorityBadge.text}
+              </span>
+            )}
+            {property.newLaunch && <span className="badge badge-new">🆕 New</span>}
+            {property.isResale && <span className="badge badge-new">🔄 Resale</span>}
+            {isRelated && <span className="badge badge-related">📍 Similar</span>}
+          </div>
+          {!property.image && <span style={{ fontSize: '2.5rem', zIndex: 2 }}>🏠</span>}
+        </div>
+        <div className="card-body">
+          <div className="price-container" style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontFamily: 'sans-serif' }}>
+            <div style={{ fontSize: '1.1rem', fontWeight: 600, color: '#1a365d' }}>
+              {formatPrice(property.price, property.transactionType)} <span style={{ fontWeight: 400, fontSize: '0.85rem', color: '#64748b' }}>Starting From</span>
+            </div>
+            {property.pricePerSqft > 0 && (
+              <div style={{ fontSize: '0.8rem', color: '#475569', fontWeight: 500 }}>
+                ₹{property.pricePerSqft.toLocaleString()}/sq ft
+              </div>
+            )}
+          </div>
+
+          <h3 className="title">{property.title}</h3>
+          <div className="location">
+            📍 {property.location}
+          </div>
+          <div className="specs">
+            <span className="spec">🏠 {property.bhk} BHK</span>
+            <span className="spec">📏 {property.area.toLocaleString()} sq ft</span>
+            <span className="spec">🏢 {property.type}</span>
+          </div>
+          {property.brand_store_name && (
+            <div className="brand-name">
+              🏗️ {property.brand_store_name}
+            </div>
+          )}
+          <div className="actions">
+            <button className="btn btn-primary" onClick={(e) => {
+              e.stopPropagation();
+              handlePropertyClick(property.id);
+            }}>Contact Now</button>
+            <button className="btn btn-outline" onClick={(e) => {
+              e.stopPropagation();
+              handlePropertyClick(property.id);
+            }}>View Details</button>
+          </div>
+        </div>
+      </div>
+    );
+  }, [formatPrice, getPriorityBadge, handlePropertyClick]);
 
   if (loading) {
     return (
@@ -706,6 +854,7 @@ const PropertiesPage = () => {
         .badge-premium { background: linear-gradient(135deg, #e056fd, #686de0); color: white; }
         .badge-normal { background: linear-gradient(135deg, #74b9ff, #0984e3); color: white; }
         .badge-new { background: linear-gradient(135deg, #00b894, #00cec9); color: white; }
+        .badge-related { background: linear-gradient(135deg, #fd79a8, #fdcb6e); color: #2c3e50; }
         
         .card-body { padding: 20px; }
         
@@ -830,6 +979,29 @@ const PropertiesPage = () => {
           flex-direction: column; 
           gap: 10px; 
           min-width: 140px; 
+        }
+        
+        .related-section {
+          margin-top: 40px;
+          padding-top: 30px;
+          border-top: 3px solid #f8f9fa;
+        }
+        
+        .related-header {
+          text-align: center;
+          margin-bottom: 30px;
+        }
+        
+        .related-title {
+          color: #2c3e50;
+          font-size: 1.8rem;
+          font-weight: 700;
+          margin-bottom: 8px;
+        }
+        
+        .related-subtitle {
+          color: #718096;
+          font-size: 1rem;
         }
         
         .pagination { 
@@ -1012,27 +1184,43 @@ const PropertiesPage = () => {
               </div>
 
               <div className="filter-group">
-                <label className="filter-label">District</label>
+                <label className="filter-label">City</label>
                 <select className="filter-select" value={filters.district} onChange={(e) => handleFilterChange('district', e.target.value)}>
-                  <option value="">Select District</option>
+                  <option value="">Select City</option>
                   {districts.map(d => <option key={d.district_id} value={d.district_id}>{d.district_name}</option>)}
                 </select>
               </div>
 
               <div className="filter-group">
-                <label className="filter-label">City</label>
+                <label className="filter-label">Locality</label>
                 <select className="filter-select" value={filters.city} onChange={(e) => handleFilterChange('city', e.target.value)} disabled={!filters.district}>
-                  <option value="">{filters.district ? 'Select City' : 'Select District First'}</option>
+                  <option value="">{filters.district ? 'Select Locality' : 'Select City First'}</option>
                   {cities.map(c => <option key={c.city_id} value={c.city_id}>{c.city_name}</option>)}
                 </select>
               </div>
 
               <div className="filter-group">
-                <label className="filter-label">Price Range (Lakhs)</label>
-                <div className="range-inputs">
-                  <input type="number" className="filter-input" placeholder="Min Price" value={filters.priceRange.min} onChange={(e) => handleFilterChange('priceRange', { min: e.target.value })} />
-                  <input type="number" className="filter-input" placeholder="Max Price" value={filters.priceRange.max} onChange={(e) => handleFilterChange('priceRange', { max: e.target.value })} />
-                </div>
+                <label className="filter-label">Budget Range</label>
+                <select
+                  className="filter-select"
+                  value={filters.budgetRange}
+                  onChange={(e) => handleFilterChange('budgetRange', e.target.value)}
+                  style={{
+                    padding: "12px",
+                    border: "2px solid #e9ecef",
+                    borderRadius: "8px",
+                    fontSize: "1rem",
+                    width: "100%",
+                    background: "white",
+                    transition: "border-color 0.3s ease",
+                  }}
+                >
+                  <option value="">Budget Range</option>
+                  <option value="20L-50L">₹20L - ₹50L</option>
+                  <option value="50L-1Cr">₹50L - ₹1Cr</option>
+                  <option value="1Cr-2Cr">₹1Cr - ₹2Cr</option>
+                  <option value="2Cr+">₹2Cr+</option>
+                </select>
               </div>
 
               <div className="filter-group">
@@ -1043,7 +1231,7 @@ const PropertiesPage = () => {
                 </div>
               </div>
 
-              <div className="filter-group">
+              <div className="filter-group" style={{ display: "none" }}> 
                 <label className="filter-label">Property Features</label>
                 <div className="checkbox-group">
                   <div className="checkbox-item">
@@ -1094,103 +1282,7 @@ const PropertiesPage = () => {
               ) : (
                 <>
                   <div className={viewMode === 'grid' ? 'properties-grid' : 'properties-list'}>
-                    {currentProperties.map((property) => {
-                      const priorityBadge = getPriorityBadge(property.priority);
-                      return viewMode === 'grid' ? (
-                        <div key={property.id} className="card" onClick={() => handlePropertyClick(property.id)}>
-                          <div className="card-image" style={{ backgroundImage: property.image ? `url(${property.image})` : 'none' }}>
-                            <div className="badges">
-                              {priorityBadge && (
-                                <span className={`badge ${priorityBadge.class}`}>
-                                  {priorityBadge.icon} {priorityBadge.text}
-                                </span>
-                              )}
-                              {property.newLaunch && <span className="badge badge-new">🆕 New</span>}
-                              {property.isResale && <span className="badge badge-new">🔄 Resale</span>}
-                            </div>
-                            {!property.image && <span style={{ fontSize: '2.5rem', zIndex: 2 }}>🏠</span>}
-                          </div>
-                          <div className="card-body">
-                            <div className="price-container" style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontFamily: 'sans-serif' }}>
-                              <div style={{ fontSize: '1.1rem', fontWeight: 600, color: '#1a365d' }}>
-                                {formatPrice(property.price, property.transactionType)} <span style={{ fontWeight: 400, fontSize: '0.85rem', color: '#64748b' }}>Starting From</span>
-                              </div>
-                              {property.pricePerSqft > 0 && (
-                                <div style={{ fontSize: '0.8rem', color: '#475569', fontWeight: 500 }}>
-                                  ₹{property.pricePerSqft.toLocaleString()}/sq ft
-                                </div>
-                              )}
-                            </div>
-
-                            <h3 className="title">{property.title}</h3>
-                            <div className="location">
-                              📍 {property.location}
-                            </div>
-                            <div className="specs">
-                              <span className="spec">🏠 {property.bhk} BHK</span>
-                              <span className="spec">📏 {property.area.toLocaleString()} sq ft</span>
-                              <span className="spec">🏢 {property.type}</span>
-                            </div>
-                            {property.brand_store_name && (
-                              <div className="brand-name">
-                                🏗️ {property.brand_store_name}
-                              </div>
-                            )}
-                            <div className="actions">
-                              <button className="btn btn-primary" onClick={(e) => {
-                                e.stopPropagation();
-                                handlePropertyClick(property.id);
-                              }}>Contact Now</button>
-                              <button className="btn btn-outline" onClick={(e) => {
-                                e.stopPropagation();
-                                handlePropertyClick(property.id);
-                              }}>View Details</button>
-                            </div>
-                          </div>
-                        </div>
-                      ) : (
-                        <div key={property.id} className="list-item" onClick={() => handlePropertyClick(property.id)}>
-                          <div className="list-image" style={{ backgroundImage: property.image ? `url(${property.image})` : 'none' }}>
-                            {!property.image && <span style={{ fontSize: '2rem' }}>🏠</span>}
-                            <div className="badges">
-                              {priorityBadge && (
-                                <span className={`badge ${priorityBadge.class}`}>
-                                  {priorityBadge.icon} {priorityBadge.text}
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                          <div>
-                            <div className="price">
-                              {formatPrice(property.price, property.transactionType)}
-                              {property.pricePerSqft > 0 && <span className="price-sqft"> (₹{property.pricePerSqft.toLocaleString()}/sq ft)</span>}
-                            </div>
-                            <h3 className="title">{property.title}</h3>
-                            <div className="location">📍 {property.location}</div>
-                            <div className="specs">
-                              <span className="spec">🏠 {property.bhk} BHK</span>
-                              <span className="spec">📏 {property.area.toLocaleString()} sq ft</span>
-                              <span className="spec">🏢 {property.type}</span>
-                            </div>
-                            {property.brand_store_name && (
-                              <div className="brand-name">
-                                🏗️ {property.brand_store_name}
-                              </div>
-                            )}
-                          </div>
-                          <div className="list-actions">
-                            <button className="btn btn-primary" onClick={(e) => {
-                              e.stopPropagation();
-                              handlePropertyClick(property.id);
-                            }}>Contact Now</button>
-                            <button className="btn btn-outline" onClick={(e) => {
-                              e.stopPropagation();
-                              handlePropertyClick(property.id);
-                            }}>View Details</button>
-                          </div>
-                        </div>
-                      );
-                    })}
+                    {currentProperties.map((property) => renderPropertyCard(property))}
                   </div>
 
                   {totalPages > 1 && (
@@ -1225,6 +1317,20 @@ const PropertiesPage = () => {
                     </div>
                   )}
                 </>
+              )}
+
+              {showRelated && relatedProperties.length > 0 && (
+                <div className="related-section">
+                  <div className="related-header">
+                    <h2 className="related-title">Similar Properties You Might Like</h2>
+                    <p className="related-subtitle">
+                      Based on your search criteria, here are {relatedProperties.length} properties that might interest you
+                    </p>
+                  </div>
+                  <div className="properties-grid">
+                    {relatedProperties.map((property) => renderPropertyCard(property, true))}
+                  </div>
+                </div>
               )}
             </div>
           </div>

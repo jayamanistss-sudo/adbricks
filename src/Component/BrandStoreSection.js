@@ -1,21 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import LoginModal from './LoginModal';
-import RegisterModal from './RegisterModal';
 
 const BrandStoreSection = ({ data }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const [imageErrors, setImageErrors] = useState(new Set());
-  const [showLoginModal, setShowLoginModal] = useState(false);
-  const [showRegisterModal, setShowRegisterModal] = useState(false);
-  const [user, setUser] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
 
   const builders = Array.from(new Map((data?.data || []).map(item => [item.id || item.name, item])).values());
 
   const navigate = dir => setCurrentSlide(prev => (prev + dir + builders.length) % builders.length);
 
-  // Check if mobile on mount and window resize
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth <= 768);
     checkMobile();
@@ -31,26 +25,12 @@ const BrandStoreSection = ({ data }) => {
 
   const getCards = () => {
     if (!builders.length) return [];
-    
-    // On mobile, show only 1 card; on desktop, show up to 3
     const cardsToShow = isMobile ? 1 : Math.min(3, builders.length);
-    
     return [...Array(cardsToShow)].map((_, i) => ({
       ...builders[(currentSlide + i) % builders.length],
       pos: i
     }));
   };
-
-  useEffect(() => {
-    const storedUser = localStorage.getItem("userDetails");
-    if (storedUser) {
-      try {
-        setUser(JSON.parse(storedUser));
-      } catch {
-        setUser(null);
-      }
-    }
-  }, []);
 
   const truncateText = (text, limit = 80) => text?.length > limit ? text.slice(0, limit) + '...' : text;
 
@@ -97,13 +77,9 @@ const BrandStoreSection = ({ data }) => {
   };
 
   function handleView(name) {
-    if (user) {
-      const params = new URLSearchParams();
-      params.append('brand_id', name);
-      window.location.href = `/properties?${params.toString()}`;
-    } else {
-      setShowLoginModal(true);
-    }
+    const params = new URLSearchParams();
+    params.append('brand_id', name);
+    window.location.href = `/properties?${params.toString()}`;
   }
 
   return (
@@ -117,16 +93,6 @@ const BrandStoreSection = ({ data }) => {
         position: 'relative' 
       }}
     >
-      <LoginModal
-        show={showLoginModal}
-        onClose={() => setShowLoginModal(false)}
-        setShowRegisterModal={setShowRegisterModal}
-      />
-      <RegisterModal
-        show={showRegisterModal}
-        onClose={() => setShowRegisterModal(false)}
-        setShowLoginModal={setShowLoginModal}
-      />
       <div style={{ 
         maxWidth: '1400px', 
         margin: '0 auto', 
@@ -345,7 +311,6 @@ const BrandStoreSection = ({ data }) => {
               </>
             )}
 
-            {/* Mobile indicators */}
             {isMobile && builders.length > 1 && (
               <div style={{
                 display: 'flex',
