@@ -1231,7 +1231,7 @@ const PropertiesPage = () => {
                 </div>
               </div>
 
-              <div className="filter-group">
+              <div className="filter-group" style={{ display: "none" }}> 
                 <label className="filter-label">Property Features</label>
                 <div className="checkbox-group">
                   <div className="checkbox-item">
