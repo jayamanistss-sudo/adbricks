@@ -12,10 +12,10 @@ const Footer = ({ data }) => {
   ];
 
   const socialLinks = [
-    { icon: "facebook-f", href: "#" },
-    { icon: "twitter", href: "#" },
-    { icon: "instagram", href: "#" },
-    { icon: "linkedin-in", href: "#" },
+    { icon: "facebook-f", href: "https://www.facebook.com/profile.php?id=61561564230410" },
+    { icon: "youtube", href: "https://www.youtube.com/@AdbricksMedia-1" },
+    { icon: "instagram", href: "https://www.instagram.com/adbricks_media/" },
+    { icon: "linkedin-in", href: "https://www.linkedin.com/in/adbricks-media-292a59381/" },
   ];
 
   const links = [

@@ -388,8 +388,10 @@ const PropertiesPage = () => {
       // Updated price filtering logic for budget range
       if (filters.budgetRange) {
         const priceRange = parseBudgetRange(filters.budgetRange);
-        if (priceRange.min && p.price < parseInt(priceRange.min) * 100000) return false;
-        if (priceRange.max && p.price > parseInt(priceRange.max) * 100000) return false;
+        if (priceRange.min) priceRange.min = Number(priceRange.min) * 0.5;
+        if (priceRange.max) priceRange.max = Number(priceRange.max) * 1.25;
+        if (priceRange.min && p.price < priceRange.min * 100000) return false;
+        if (priceRange.max && p.price > priceRange.max * 100000) return false;
       }
 
       if (filters.areaRange.min && filters.areaRange.min !== '' && p.area < parseInt(filters.areaRange.min)) return false;
@@ -1182,17 +1184,17 @@ const PropertiesPage = () => {
               </div>
 
               <div className="filter-group">
-                <label className="filter-label">District</label>
+                <label className="filter-label">City</label>
                 <select className="filter-select" value={filters.district} onChange={(e) => handleFilterChange('district', e.target.value)}>
-                  <option value="">Select District</option>
+                  <option value="">Select City</option>
                   {districts.map(d => <option key={d.district_id} value={d.district_id}>{d.district_name}</option>)}
                 </select>
               </div>
 
               <div className="filter-group">
-                <label className="filter-label">City</label>
+                <label className="filter-label">Locality</label>
                 <select className="filter-select" value={filters.city} onChange={(e) => handleFilterChange('city', e.target.value)} disabled={!filters.district}>
-                  <option value="">{filters.district ? 'Select City' : 'Select District First'}</option>
+                  <option value="">{filters.district ? 'Select Locality' : 'Select City First'}</option>
                   {cities.map(c => <option key={c.city_id} value={c.city_id}>{c.city_name}</option>)}
                 </select>
               </div>
