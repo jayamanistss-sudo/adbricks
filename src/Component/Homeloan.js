@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const api = "https://demo.stss.in/admin/Config/router.php?router=";
 
 const HomeLoanProviders = () => {
   const [providers, setProviders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetch(`${api}home_loan`)
@@ -26,7 +28,27 @@ const HomeLoanProviders = () => {
   return (
     <section style={{ padding: "100px 20px", background: "#4585b2", minHeight: "100vh" }}>
       <div style={{ maxWidth: "1400px", margin: "0 auto" }}>
-        {/* Header */}
+        <button
+          onClick={() => navigate(-1)}
+          style={{
+            background: "white",
+            border: "none",
+            padding: "10px 20px",
+            borderRadius: "10px",
+            fontSize: "1rem",
+            fontWeight: "600",
+            color: "#4585b2",
+            cursor: "pointer",
+            marginBottom: "30px",
+            boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
+            transition: "all 0.3s ease"
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.background = "#f1f1f1")}
+          onMouseLeave={(e) => (e.currentTarget.style.background = "white")}
+        >
+          ← Back
+        </button>
+
         <div style={{ textAlign: "center", marginBottom: "80px" }}>
           <h1 style={{
             fontSize: "3.5rem", fontWeight: "900", color: "white",
@@ -46,7 +68,6 @@ const HomeLoanProviders = () => {
           }}></div>
         </div>
 
-        {/* Providers Grid */}
         <div style={{
           display: "grid",
           gridTemplateColumns: "repeat(auto-fit, minmax(380px, 1fr))",
@@ -68,14 +89,12 @@ const HomeLoanProviders = () => {
                 e.currentTarget.style.boxShadow = "0 20px 60px rgba(0,0,0,0.15)";
               }}
             >
-              {/* Decorative Background */}
               <div style={{
                 position: "absolute", top: "-50px", right: "-50px",
                 width: "150px", height: "150px", background: provider.gradient,
                 borderRadius: "50%", opacity: "0.1", zIndex: 0
               }}></div>
 
-              {/* Header */}
               <div style={{ display: "flex", alignItems: "center", gap: "20px", marginBottom: "30px", position: "relative", zIndex: 1 }}>
                 <div style={{
                   background: provider.gradient, borderRadius: "20px", width: "75px", height: "75px",
@@ -97,7 +116,6 @@ const HomeLoanProviders = () => {
                 </div>
               </div>
 
-              {/* Details */}
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "25px", marginBottom: "30px", position: "relative", zIndex: 1 }}>
                 <div style={{ padding: "20px", background: "rgba(255,255,255,0.7)", borderRadius: "16px", border: "1px solid rgba(0,0,0,0.05)" }}>
                   <div style={{ fontSize: "0.9rem", color: "#718096", fontWeight: "600", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.5px" }}>
@@ -125,7 +143,6 @@ const HomeLoanProviders = () => {
                 </div>
               </div>
 
-              {/* Contact */}
               <div style={{ borderTop: "2px solid rgba(0,0,0,0.08)", paddingTop: "25px", position: "relative", zIndex: 1 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "12px", padding: "12px 0" }}>
                   <div style={{ width: "40px", height: "40px", borderRadius: "10px", background: "rgba(102, 126, 234, 0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -144,15 +161,12 @@ const HomeLoanProviders = () => {
           ))}
         </div>
 
-        {/* Footer */}
         <div style={{ textAlign: "center", marginTop: "60px", padding: "30px", background: "rgba(255,255,255,0.1)", borderRadius: "20px", backdropFilter: "blur(20px)" }}>
           <p style={{ color: "rgba(255,255,255,0.9)", fontSize: "1.1rem", margin: 0, fontWeight: 300, lineHeight: 1.6 }}>
             💡 Interest rates are subject to change and may vary based on loan amount, tenure, and creditworthiness. Contact providers directly for personalized quotes and current offers.
           </p>
         </div>
       </div>
-
-      {/* FontAwesome */}
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     </section>
   );

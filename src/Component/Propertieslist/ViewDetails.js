@@ -81,20 +81,21 @@ const PropertyDetailsPage = () => {
     if (!builtupAreaData) return "N/A";
 
     try {
-      if (builtupAreaData.startsWith('[')) {
+      if (builtupAreaData.startsWith("[")) {
         const parsed = JSON.parse(builtupAreaData);
-        return Array.isArray(parsed) ? parsed[0] : builtupAreaData;
-      }
-      else if (builtupAreaData.startsWith('{')) {
+        return Array.isArray(parsed) ? parsed.join(", ") : builtupAreaData;
+      } else if (builtupAreaData.startsWith("{")) {
         const parsed = JSON.parse(builtupAreaData);
-        const keys = Object.keys(parsed);
-        return keys.length > 0 ? parsed[keys[0]] : "N/A";
+        const values = Object.values(parsed);
+        return values.length > 0 ? values.join(", ") : "N/A";
       }
       return builtupAreaData;
     } catch {
       return builtupAreaData;
     }
   };
+
+
 
   const parseBhkConfig = (bhkConfig) => {
     if (!bhkConfig) return "N/A";
@@ -1086,7 +1087,7 @@ const PropertyDetailsPage = () => {
             <div className="contact-card">
               <h3>Interested in this property?</h3>
               <button className="btn-primary" onClick={() => setShowContactForm(true)}>
-                Mssage Owner
+                Message Owner
               </button>
               <button className="btn-secondary" onClick={() => window.open(`tel:${property.contact_number}`)}>
                 📞 {property.contact_number}
