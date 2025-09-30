@@ -9,15 +9,6 @@ const AboutSection = ({ data }) => {
     }
   }, [data]);
 
-  const services = [
-    { icon: "fas fa-bullhorn", title: "Lead Generation", desc: "Convert prospects into customers" },
-    { icon: "fas fa-rocket", title: "Brand Promotion", desc: "Elevate your brand presence" },
-    { icon: "fas fa-laptop", title: "Digital Marketing", desc: "Online growth strategies" },
-    { icon: "fas fa-newspaper", title: "Print Media", desc: "Newspaper advertisements" },
-    { icon: "fas fa-billboard", title: "Outdoor Ads", desc: "Billboard and hoarding campaigns" },
-    { icon: "fas fa-users", title: "BTL Advertising", desc: "Direct customer engagement" }
-  ];
-
   const achievements = [
     { number: "20+", label: "Years Experience" },
     { number: "500+", label: "Successful Campaigns" },
@@ -92,7 +83,7 @@ const AboutSection = ({ data }) => {
 
         <div style={{
           display: "grid",
-          gridTemplateColumns: "1.2fr 0.8fr",
+          gridTemplateColumns: "1fr",
           gap: "60px",
           alignItems: "start",
           marginBottom: "80px"
@@ -193,104 +184,6 @@ const AboutSection = ({ data }) => {
                     fontWeight: "600"
                   }}>
                     {achievement.label}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div style={{
-            background: "white",
-            borderRadius: "20px",
-            padding: "40px",
-            boxShadow: "0 15px 35px rgba(0,0,0,0.1)",
-            border: "1px solid rgba(255,255,255,0.8)",
-            height: "fit-content"
-          }}>
-            <div style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "15px",
-              marginBottom: "30px"
-            }}>
-              <div style={{
-                background: "linear-gradient(135deg, #e74c3c, #c0392b)",
-                borderRadius: "50%",
-                width: "50px",
-                height: "50px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center"
-              }}>
-                <i className="fas fa-cogs" style={{ color: "white", fontSize: "1.2rem" }}></i>
-              </div>
-              <h4 style={{
-                color: "#2c3e50",
-                fontSize: "1.6rem",
-                margin: 0,
-                fontWeight: "700"
-              }}>
-                Our Services
-              </h4>
-            </div>
-
-            <p style={{
-              marginBottom: "25px",
-              color: "#6c757d",
-              lineHeight: "1.6",
-              fontSize: "1rem"
-            }}>
-              Our comprehensive range of services designed to accelerate your business growth:
-            </p>
-
-            <div style={{
-              display: "grid",
-              gap: "15px"
-            }}>
-              {services.map((service, index) => (
-                <div key={index} style={{
-                  padding: "15px",
-                  borderRadius: "12px",
-                  background: "linear-gradient(135deg, #f8f9fa, #ffffff)",
-                  border: "1px solid #e9ecef",
-                  transition: "all 0.3s ease"
-                }}>
-                  <div style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "12px"
-                  }}>
-                    <div style={{
-                      background: "linear-gradient(135deg, #3498db, #2c3e50)",
-                      borderRadius: "8px",
-                      width: "35px",
-                      height: "35px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      flexShrink: 0
-                    }}>
-                      <i className={service.icon} style={{
-                        color: "white",
-                        fontSize: "0.9rem"
-                      }}></i>
-                    </div>
-                    <div>
-                      <div style={{
-                        fontWeight: "600",
-                        color: "#2c3e50",
-                        fontSize: "1rem",
-                        marginBottom: "2px"
-                      }}>
-                        {service.title}
-                      </div>
-                      <div style={{
-                        fontSize: "0.85rem",
-                        color: "#6c757d"
-                      }}>
-                        {service.desc}
-                      </div>
-                    </div>
                   </div>
                 </div>
               ))}
