@@ -88,7 +88,7 @@ const HeroSection = ({ registeredUser }) => {
       <section
         id="home"
         style={{
-          background: `url('https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1973&q=80') center/cover`,
+          background: `url('./home.jpeg') center/cover`,
           color: "white",
           padding: breakpoint === "mobile" ? "100px 0 50px" : "180px 0 100px",
           textAlign: "center",
@@ -126,7 +126,7 @@ const HeroSection = ({ registeredUser }) => {
               textShadow: "2px 2px 8px rgba(0,0,0,0.6)",
             }}
           >
-            Find Your Dream Property
+           Bricks to build your assets -Adbricks
           </h1>
           <p style={{ 
             fontSize: "1.3rem", 
@@ -134,7 +134,7 @@ const HeroSection = ({ registeredUser }) => {
             opacity: 0.95,
             textShadow: "1px 1px 4px rgba(0,0,0,0.5)",
           }}>
-            Connecting Buyers, Sellers, and Builders with Trust & Transparency
+            Connecting premium builders,Direct Sellers, GENIUNE BUYERS WITH TUST AND TRANSPERANCEY
           </p>
           <div
             style={{
@@ -285,7 +285,7 @@ const HeroSection = ({ registeredUser }) => {
                 fontSize: "1.1rem",
                 cursor: "pointer",
                 transition: "all 0.3s ease",
-                width: "100%",
+                width: "50%",
                 boxShadow: "0 4px 15px rgba(52, 152, 219, 0.3)",
                 textShadow: "1px 1px 2px rgba(0,0,0,0.3)",
               }}

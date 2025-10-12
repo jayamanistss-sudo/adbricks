@@ -33,8 +33,8 @@ const Footer = ({ data }) => {
 
   const links = [
     { href: "/#home", label: "Home", icon: "fas fa-home" },
-    { href: "/#about", label: "About", icon: "fas fa-info-circle" },
-    { href: "/properties", label: "Properties", icon: "fas fa-building" },
+    // { href: "/#about", label: "About", icon: "fas fa-info-circle" },
+    { href: "/properties", label: "Find Properties", icon: "fas fa-building" },
   ];
 
   return (

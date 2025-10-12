@@ -8,6 +8,7 @@ const Navbar = ({ setShowLoginModal, setShowPostPropertyModal, generalStatsdata 
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeHash, setActiveHash] = useState(window.location.hash || "#home");
   const breakpoint = useResponsive();
+
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
     window.addEventListener("scroll", handleScroll);
@@ -32,19 +33,14 @@ const Navbar = ({ setShowLoginModal, setShowPostPropertyModal, generalStatsdata 
     }
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem("userDetails");
-    setUser(null);
-  };
-
   const handleNavClick = (e, href) => {
     window.location.hash = href;
   };
+
   const links = [
     { href: "#home", label: "Home", icon: "fas fa-home" },
-    { href: "/properties", label: "Properties", icon: "fas fa-building" },
+    { href: "/properties", label: "Find Properties", icon: "fas fa-building" },
     { href: "#brand-store", label: "Brand Store", icon: "fas fa-store" },
-    { href: "#about", label: "About", icon: "fas fa-info-circle" },
     { href: "/homeloan", label: "Home Loan", icon: "fas fa-university" },
     { href: "/interiors", label: "Interiors", icon: "fas fa-couch" },
   ];
@@ -99,7 +95,7 @@ const Navbar = ({ setShowLoginModal, setShowPostPropertyModal, generalStatsdata 
           <li>
             <button
               onClick={() => {
-                handleLogout();
+                setShowPostPropertyModal(true);
                 setMenuOpen(false);
               }}
               style={{
@@ -109,7 +105,7 @@ const Navbar = ({ setShowLoginModal, setShowPostPropertyModal, generalStatsdata 
                 cursor: "pointer",
               }}
             >
-              <i className="fas fa-sign-out-alt"></i> Logout
+              <i className="fas fa-plus-circle"></i> Post Property
             </button>
           </li>
         </>
@@ -141,20 +137,19 @@ const Navbar = ({ setShowLoginModal, setShowPostPropertyModal, generalStatsdata 
             width: "100%",
           }}
         >
-          {/* Logo */}
-          <a href="#home" style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            {navData.logo_url ? (
-              <img
-                src={navData.logo_url}
-                alt={navData.site_name}
-                style={{ height: breakpoint === "mobile" ? "50px" : "60px", borderRadius: "6px" }}
-              />
-            ) : (
-              <i className="fas fa-home" style={{ color: "white", fontSize: "1.8rem" }} />
-            )}
+          <a href="#home" style={{ textDecoration: "none" }}>
+            <span
+              style={{
+                color: "white",
+                fontWeight: "bold",
+                fontSize: breakpoint === "mobile" ? "1.2rem" : "1.6rem",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {navData.site_name || "Site Name"}
+            </span>
           </a>
 
-          {/* Desktop Menu */}
           <ul
             className="desktop-menu"
             style={{
@@ -170,7 +165,6 @@ const Navbar = ({ setShowLoginModal, setShowPostPropertyModal, generalStatsdata 
             <NavLinks />
           </ul>
 
-          {/* Mobile Hamburger */}
           <div
             className="hamburger"
             onClick={() => setMenuOpen(!menuOpen)}
@@ -188,7 +182,6 @@ const Navbar = ({ setShowLoginModal, setShowPostPropertyModal, generalStatsdata 
         </div>
       </div>
 
-      {/* Sidebar */}
       {menuOpen && (
         <div style={sidebarOverlay} onClick={() => setMenuOpen(false)}>
           <div style={sidebar} onClick={(e) => e.stopPropagation()}>
@@ -207,7 +200,6 @@ const Navbar = ({ setShowLoginModal, setShowPostPropertyModal, generalStatsdata 
   );
 };
 
-/* ---------- Styles ---------- */
 const navLinkStyle = {
   color: "white",
   textDecoration: "none",
@@ -274,7 +266,6 @@ const sidebarList = {
   gap: "15px",
 };
 
-/* Responsive (hide desktop menu, show hamburger) */
 const styleSheet = document.createElement("style");
 styleSheet.innerHTML = `
   @media (max-width: 768px) {
