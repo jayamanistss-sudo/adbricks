@@ -34,7 +34,6 @@ const PropertyShowcase = ({ data }) => {
   }, []);
 
   useEffect(() => {
-    if (!isAutoPlaying || properties.length <= 1) return;
     const timer = setInterval(() => navigate(1), 5000);
     return () => clearInterval(timer);
   }, [isAutoPlaying, properties.length, navigate]);

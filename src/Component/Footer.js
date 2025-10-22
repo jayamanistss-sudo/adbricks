@@ -32,20 +32,29 @@ const Footer = ({ data }) => {
   ];
 
   const links = [
-    { href: "/#home", label: "Home", icon: "fas fa-home" },
-    // { href: "/#about", label: "About", icon: "fas fa-info-circle" },
-    { href: "/properties", label: "Find Properties", icon: "fas fa-building" },
+    { href: "/#home", label: "Home" },
+    { href: "/properties", label: "Find Properties" },
   ];
 
   return (
     <footer style={{ background: "#2c3e50", color: "white", padding: "50px 0 20px" }}>
       <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 20px" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: "40px" }}>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+            gap: "40px",
+          }}
+        >
           <div>
             <h5 style={{ color: "#f39c12", marginBottom: "20px" }}>
-              <img src={siteData.logo_url} alt={siteData.site_name} style={{ width: "150px" }} />
+              {siteData.logo_url && (
+                <img src={siteData.logo_url} alt={siteData.site_name} style={{ width: "150px" }} />
+              )}
             </h5>
-            <p style={{ lineHeight: "1.6", marginBottom: "20px" }}>{siteData.about_us}</p>
+            <p style={{ lineHeight: "1.6", marginBottom: "20px" }}>
+              {siteData.about_us || "Your company description here."}
+            </p>
             <div style={{ marginTop: "20px" }}>
               {socialLinks.map((social, index) => (
                 <a
@@ -58,7 +67,6 @@ const Footer = ({ data }) => {
                     marginRight: "15px",
                     color: "white",
                     fontSize: "1.5rem",
-                    textDecoration: "none",
                   }}
                 >
                   {social.icon}
@@ -71,7 +79,10 @@ const Footer = ({ data }) => {
             <h5 style={{ color: "#f39c12", marginBottom: "20px" }}>Contact Info</h5>
             <ul style={{ listStyle: "none", padding: 0 }}>
               {contactInfo.map((info, index) => (
-                <li key={index} style={{ margin: "10px 0", display: "flex", alignItems: "center", gap: "8px" }}>
+                <li
+                  key={index}
+                  style={{ margin: "10px 0", display: "flex", alignItems: "center", gap: "8px" }}
+                >
                   {info.icon} {info.text}
                 </li>
               ))}
@@ -84,7 +95,7 @@ const Footer = ({ data }) => {
               {links.map((link, index) => (
                 <li key={index}>
                   <a href={link.href} style={navLinkStyle}>
-                    <i className={`${link.icon}`}></i> {link.label}
+                    {link.label}
                   </a>
                 </li>
               ))}
@@ -102,7 +113,9 @@ const Footer = ({ data }) => {
             alignItems: "center",
           }}
         >
-          <p style={{ margin: 0 }}>&copy; 2025 {siteData.site_name || "Adbricks.com"}. All rights reserved.</p>
+          <p style={{ margin: 0 }}>
+            &copy; 2025 {siteData.site_name || "Adbricks.com"}. All rights reserved.
+          </p>
           <div>
             <span onClick={() => setPopup("privacy")} style={footerLinkStyle}>
               Privacy Policy *
@@ -121,7 +134,7 @@ const Footer = ({ data }) => {
               {popup === "privacy" ? "Privacy Policy" : "Terms of Service"}
             </h2>
             <p style={{ color: "black" }}>
-              {popup === "privacy" ? siteData.privacy_policy : siteData.terms_of_service}
+              {popup === "privacy" ? siteData.privacy_policy || "Privacy policy text." : siteData.terms_of_service || "Terms of service text."}
             </p>
             <button onClick={() => setPopup(null)} style={closeBtnStyle}>
               Close
@@ -179,7 +192,6 @@ const navLinkStyle = {
   justifyContent: "center",
   gap: "8px",
   lineHeight: "1.5",
-  verticalAlign: "middle",
 };
 
 const footerLinkStyle = {

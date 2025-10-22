@@ -15,7 +15,16 @@ const HeroSection = ({ registeredUser }) => {
   const [user, setUser] = useState(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showRegisterModal, setShowRegisterModal] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
   useEffect(() => {
     const fetchDistricts = async () => {
       const res = await api("district_type_list", "GET");
@@ -55,14 +64,14 @@ const HeroSection = ({ registeredUser }) => {
   }, [selectedDistrict]);
 
   const handleSearch = () => {
-      const params = new URLSearchParams();
-      if (activeTab) {
-        params.append("is_resale", activeTab === "new" ? "0" : "1");
-      }
-      if (selectedDistrict) params.append("district", selectedDistrict);
-      if (selectedCity) params.append("city", selectedCity);
-      if (budgetRange) params.append("budget", budgetRange);
-      window.location.href = `/properties?${params.toString()}`;
+    const params = new URLSearchParams();
+    if (activeTab) {
+      params.append("is_resale", activeTab === "new" ? "0" : "1");
+    }
+    if (selectedDistrict) params.append("district", selectedDistrict);
+    if (selectedCity) params.append("city", selectedCity);
+    if (budgetRange) params.append("budget", budgetRange);
+    window.location.href = `/properties?${params.toString()}`;
   };
 
   const handleViewContact = () => {
@@ -88,16 +97,23 @@ const HeroSection = ({ registeredUser }) => {
       <section
         id="home"
         style={{
-          background: `url('./home.jpeg') center/cover`,
+          backgroundImage: "url('./Home.png')",
+          backgroundPosition: "center",
+          backgroundSize: "cover",
+          backgroundRepeat: "no-repeat",
           color: "white",
-          padding: breakpoint === "mobile" ? "100px 0 50px" : "180px 0 100px",
+          padding: isMobile ? "60px 20px 30px" : "100px 20px 80px",
           textAlign: "center",
-          marginTop: breakpoint === "mobile" ? "0px" : "80px",
-          position: "relative"
+          position: "relative",
+          minHeight: isMobile ? "auto" : "100vh",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: isMobile ? "flex-start" : "center",
+          alignItems: "center",
         }}
       >
         {/* Alternative background overlay for better text readability */}
-        <div 
+        <div
           style={{
             position: "absolute",
             top: 0,
@@ -107,51 +123,34 @@ const HeroSection = ({ registeredUser }) => {
             zIndex: 1,
           }}
         />
-        
-        <div 
-          className="container" 
-          style={{ 
-            maxWidth: "1200px", 
-            margin: "0 auto", 
+
+        <div
+          className="container"
+          style={{
+            maxWidth: "900px",
+            margin: "0 auto",
             padding: "0 20px",
             position: "relative",
             zIndex: 2,
           }}
         >
-          <h1
-            style={{
-              fontSize: breakpoint === "mobile" ? "2.5rem" : "3.5rem",
-              marginBottom: "1rem",
-              fontWeight: "bold",
-              textShadow: "2px 2px 8px rgba(0,0,0,0.6)",
-            }}
-          >
-           Bricks to build your assets -Adbricks
-          </h1>
-          <p style={{ 
-            fontSize: "1.3rem", 
-            marginBottom: "2rem", 
-            opacity: 0.95,
-            textShadow: "1px 1px 4px rgba(0,0,0,0.5)",
-          }}>
-            Connecting premium builders,Direct Sellers, GENIUNE BUYERS WITH TUST AND TRANSPERANCEY
-          </p>
           <div
             style={{
               background: "rgba(255, 255, 255, 0.95)",
               backdropFilter: "blur(10px)",
               borderRadius: "15px",
-              padding: breakpoint === "mobile" ? "15px" : "30px",
-              marginTop: "50px",
+              padding: breakpoint === "mobile" ? "12px" : "20px",
+              marginTop: "326px",
               boxShadow: "0 20px 40px rgba(0,0,0,0.3)",
               color: "#2c3e50",
               border: "1px solid rgba(255, 255, 255, 0.3)",
+              width: "630px",
             }}
           >
             <div
               style={{
                 display: "flex",
-                marginBottom: "20px",
+                marginBottom: "15px",
                 borderRadius: "10px",
                 overflow: "hidden",
                 position: "relative",
@@ -178,7 +177,7 @@ const HeroSection = ({ registeredUser }) => {
                   onClick={() => setActiveTab(tab)}
                   style={{
                     flex: 1,
-                    padding: "15px",
+                    padding: "10px",
                     background: "transparent",
                     color: activeTab === tab ? "white" : "#2c3e50",
                     border: "none",
@@ -198,21 +197,21 @@ const HeroSection = ({ registeredUser }) => {
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
-                gap: "15px",
-                marginBottom: "20px",
+                gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+                gap: "12px",
+                marginBottom: "15px",
               }}
             >
               <div>
-                <label style={{ display: "block", marginBottom: "5px", fontWeight: "500" }}>Select City</label>
+                <label style={{ display: "block", marginBottom: "5px", fontWeight: "500", fontSize: "0.9rem" }}>Select City</label>
                 <select
                   value={selectedDistrict}
                   onChange={(e) => setSelectedDistrict(e.target.value)}
                   style={{
-                    padding: "12px",
+                    padding: "10px",
                     border: "2px solid #e9ecef",
                     borderRadius: "8px",
-                    fontSize: "1rem",
+                    fontSize: "0.95rem",
                     width: "100%",
                     background: "white",
                     transition: "border-color 0.3s ease",
@@ -227,15 +226,15 @@ const HeroSection = ({ registeredUser }) => {
                 </select>
               </div>
               <div>
-                <label style={{ display: "block", marginBottom: "5px", fontWeight: "500" }}>Select Locality</label>
+                <label style={{ display: "block", marginBottom: "5px", fontWeight: "500", fontSize: "0.9rem" }}>Select Locality</label>
                 <select
                   value={selectedCity}
                   onChange={(e) => setSelectedCity(e.target.value)}
                   style={{
-                    padding: "12px",
+                    padding: "10px",
                     border: "2px solid #e9ecef",
                     borderRadius: "8px",
-                    fontSize: "1rem",
+                    fontSize: "0.95rem",
                     width: "100%",
                     background: "white",
                     transition: "border-color 0.3s ease",
@@ -251,15 +250,15 @@ const HeroSection = ({ registeredUser }) => {
                 </select>
               </div>
               <div>
-                <label style={{ display: "block", marginBottom: "5px", fontWeight: "500" }}>Budget Range</label>
+                <label style={{ display: "block", marginBottom: "5px", fontWeight: "500", fontSize: "0.9rem" }}>Budget Range</label>
                 <select
                   value={budgetRange}
                   onChange={(e) => setBudgetRange(e.target.value)}
                   style={{
-                    padding: "12px",
+                    padding: "10px",
                     border: "2px solid #e9ecef",
                     borderRadius: "8px",
-                    fontSize: "1rem",
+                    fontSize: "0.95rem",
                     width: "100%",
                     background: "white",
                     transition: "border-color 0.3s ease",
@@ -278,11 +277,11 @@ const HeroSection = ({ registeredUser }) => {
               style={{
                 background: "linear-gradient(135deg, #3498db, #2980b9)",
                 border: "none",
-                padding: "15px 30px",
+                padding: "12px 25px",
                 borderRadius: "25px",
                 fontWeight: "500",
                 color: "white",
-                fontSize: "1.1rem",
+                fontSize: "1rem",
                 cursor: "pointer",
                 transition: "all 0.3s ease",
                 width: "50%",
@@ -304,14 +303,14 @@ const HeroSection = ({ registeredUser }) => {
               <button
                 onClick={handleViewContact}
                 style={{
-                  marginTop: "20px",
+                  marginTop: "15px",
                   background: "linear-gradient(135deg, #f39c12, #e67e22)",
                   border: "none",
-                  padding: "12px 25px",
+                  padding: "10px 20px",
                   borderRadius: "25px",
                   fontWeight: "500",
                   color: "white",
-                  fontSize: "1rem",
+                  fontSize: "0.95rem",
                   cursor: "pointer",
                   transition: "all 0.3s ease",
                   boxShadow: "0 4px 15px rgba(243, 156, 18, 0.3)",

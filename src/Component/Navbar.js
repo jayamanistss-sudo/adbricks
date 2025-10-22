@@ -37,8 +37,17 @@ const Navbar = ({ setShowLoginModal, setShowPostPropertyModal, generalStatsdata 
     window.location.hash = href;
   };
 
+  const handlePostAssetClick = () => {
+    setMenuOpen(false);
+    if (user) {
+      setShowPostPropertyModal(true);
+    } else {
+      setShowLoginModal(true);
+    }
+  };
+
   const links = [
-    { href: "#home", label: "Home", icon: "fas fa-home" },
+    // { href: "#home", label: "Home", icon: "fas fa-home" },
     { href: "/properties", label: "Find Properties", icon: "fas fa-building" },
     { href: "#brand-store", label: "Brand Store", icon: "fas fa-store" },
     { href: "/homeloan", label: "Home Loan", icon: "fas fa-university" },
@@ -71,45 +80,20 @@ const Navbar = ({ setShowLoginModal, setShowPostPropertyModal, generalStatsdata 
         );
       })}
 
-      {!user ? (
-        <li>
-          <a
-            href="#"
-            onClick={(e) => {
-              e.preventDefault();
-              setShowLoginModal(true);
-              setMenuOpen(false);
-            }}
-            style={navLinkStyle}
-          >
-            <i className="fas fa-sign-in-alt"></i> Login
-          </a>
-        </li>
-      ) : (
-        <>
-          <li>
-            <a href="/profile" style={navLinkStyle}>
-              <i className="fas fa-user"></i> Profile
-            </a>
-          </li>
-          <li>
-            <button
-              onClick={() => {
-                setShowPostPropertyModal(true);
-                setMenuOpen(false);
-              }}
-              style={{
-                ...navLinkStyle,
-                background: "transparent",
-                border: "none",
-                cursor: "pointer",
-              }}
-            >
-              <i className="fas fa-plus-circle"></i> Post Property
-            </button>
-          </li>
-        </>
-      )}
+      <li>
+        <button
+          onClick={handlePostAssetClick}
+          className="glow-button"
+          style={{
+            ...postAssetButtonStyle,
+            background: "transparent",
+            border: "none",
+            cursor: "pointer",
+          }}
+        >
+          <i className="fas fa-plus-circle"></i> Post your property ( Free)
+        </button>
+      </li>
     </>
   );
 
@@ -137,17 +121,17 @@ const Navbar = ({ setShowLoginModal, setShowPostPropertyModal, generalStatsdata 
             width: "100%",
           }}
         >
-          <a href="#home" style={{ textDecoration: "none" }}>
-            <span
-              style={{
-                color: "white",
-                fontWeight: "bold",
-                fontSize: breakpoint === "mobile" ? "1.2rem" : "1.6rem",
-                whiteSpace: "nowrap",
-              }}
-            >
-              {navData.site_name || "Site Name"}
-            </span>
+           {/* Logo */}
+          <a href="#home" style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            {navData.logo_url ? (
+              <img
+                src={navData.logo_url}
+                alt={navData.site_name}
+                style={{ height: breakpoint === "mobile" ? "50px" : "60px", borderRadius: "6px" }}
+              />
+            ) : (
+              <i className="fas fa-home" style={{ color: "white", fontSize: "1.8rem" }} />
+            )}
           </a>
 
           <ul
@@ -215,6 +199,24 @@ const navLinkStyle = {
   verticalAlign: "middle",
 };
 
+const postAssetButtonStyle = {
+  color: "white",
+  textDecoration: "none",
+  fontWeight: "600",
+  padding: "10px 20px",
+  borderRadius: "25px",
+  transition: "all 0.3s ease",
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: "8px",
+  lineHeight: "1.5",
+  verticalAlign: "middle",
+  background: "linear-gradient(135deg, #f39c12, #e74c3c)",
+  boxShadow: "0 0 20px rgba(243, 156, 18, 0.6)",
+  animation: "glow 2s ease-in-out infinite",
+};
+
 const hamburgerLine = {
   width: "25px",
   height: "3px",
@@ -276,7 +278,19 @@ styleSheet.innerHTML = `
     from { transform: translateX(100%); }
     to { transform: translateX(0); }
   }
+  @keyframes glow {
+    0%, 100% {
+      box-shadow: 0 0 20px rgba(243, 156, 18, 0.6), 0 0 30px rgba(243, 156, 18, 0.4);
+    }
+    50% {
+      box-shadow: 0 0 30px rgba(243, 156, 18, 0.8), 0 0 40px rgba(243, 156, 18, 0.6);
+    }
+  }
+  .glow-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 35px rgba(243, 156, 18, 0.9), 0 0 50px rgba(243, 156, 18, 0.7) !important;
+  }
 `;
 document.head.appendChild(styleSheet);
 
-export default Navbar;
+export default Navbar
