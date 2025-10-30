@@ -28,10 +28,17 @@ const HeroSection = ({ registeredUser }) => {
   useEffect(() => {
     const fetchDistricts = async () => {
       const res = await api("district_type_list", "GET");
-      if (res.status === 200) setDistricts(res.data.filter((d) => d.active === "1"));
+      if (res.status === 200) {
+        const activeDistricts = res.data.filter((d) => d.active === "1");
+        setDistricts(activeDistricts);
+        if (activeDistricts.length > 0) {
+          setSelectedDistrict(activeDistricts[0].district_id);
+        }
+      }
     };
     fetchDistricts();
   }, []);
+
 
   useEffect(() => {
     const storedUser = localStorage.getItem("userDetails");
@@ -97,7 +104,7 @@ const HeroSection = ({ registeredUser }) => {
       <section
         id="home"
         style={{
-          backgroundImage: "url('./Home.png')",
+          backgroundImage: "url('./Home.jpeg')",
           backgroundPosition: "center",
           backgroundSize: "cover",
           backgroundRepeat: "no-repeat",
