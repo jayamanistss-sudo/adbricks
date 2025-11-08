@@ -210,7 +210,7 @@ const HeroSection = ({ registeredUser }) => {
               }}
             >
               <div>
-                <label style={{ display: "block", marginBottom: "5px", fontWeight: "500", fontSize: "0.9rem" }}>Select City</label>
+                <label style={{ display: "block", marginBottom: "5px", fontWeight: "500", fontSize: "0.9rem" }}></label>
                 <select
                   value={selectedDistrict}
                   onChange={(e) => setSelectedDistrict(e.target.value)}
@@ -233,7 +233,7 @@ const HeroSection = ({ registeredUser }) => {
                 </select>
               </div>
               <div>
-                <label style={{ display: "block", marginBottom: "5px", fontWeight: "500", fontSize: "0.9rem" }}>Select Locality</label>
+                <label style={{ display: "block", marginBottom: "5px", fontWeight: "500", fontSize: "0.9rem" }}></label>
                 <select
                   value={selectedCity}
                   onChange={(e) => setSelectedCity(e.target.value)}
@@ -257,7 +257,7 @@ const HeroSection = ({ registeredUser }) => {
                 </select>
               </div>
               <div>
-                <label style={{ display: "block", marginBottom: "5px", fontWeight: "500", fontSize: "0.9rem" }}>Budget Range</label>
+                <label style={{ display: "block", marginBottom: "5px", fontWeight: "500", fontSize: "0.9rem" }}></label>
                 <select
                   value={budgetRange}
                   onChange={(e) => setBudgetRange(e.target.value)}

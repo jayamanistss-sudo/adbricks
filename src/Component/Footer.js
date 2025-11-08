@@ -22,8 +22,8 @@ const Footer = ({ data }) => {
 
   const socialLinks = [
     { icon: <FaFacebookF />, href: "https://www.facebook.com/profile.php?id=61561564230410" },
-    { icon: <FaYoutube />, href: "https://www.youtube.com/@AdbricksMedia-1" },
-    { icon: <FaInstagram />, href: "https://www.instagram.com/adbricks_media/" },
+    { icon: <FaYoutube />, href: "https://www.youtube.com/@Adbricks.in-1" },
+    { icon: <FaInstagram />, href: "https://www.linkedin.com/in/adbricks-in-292a59381/" },
     { icon: <FaLinkedinIn />, href: "https://www.linkedin.com/in/adbricks-media-292a59381/" },
     {
       icon: <FaWhatsapp />,
