@@ -6,7 +6,7 @@ import { useResponsive } from "../hooks";
 
 const HeroSection = ({ registeredUser }) => {
   const breakpoint = useResponsive();
-  const [activeTab, setActiveTab] = useState("new");
+  const [activeTab, setActiveTab] = useState("buy");
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [selectedCity, setSelectedCity] = useState("");
   const [budgetRange, setBudgetRange] = useState("");
@@ -15,16 +15,7 @@ const HeroSection = ({ registeredUser }) => {
   const [user, setUser] = useState(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showRegisterModal, setShowRegisterModal] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
 
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
   useEffect(() => {
     const fetchDistricts = async () => {
       const res = await api("district_type_list", "GET");
@@ -38,7 +29,6 @@ const HeroSection = ({ registeredUser }) => {
     };
     fetchDistricts();
   }, []);
-
 
   useEffect(() => {
     const storedUser = localStorage.getItem("userDetails");
@@ -72,21 +62,11 @@ const HeroSection = ({ registeredUser }) => {
 
   const handleSearch = () => {
     const params = new URLSearchParams();
-    if (activeTab) {
-      params.append("is_resale", activeTab === "new" ? "0" : "1");
-    }
+    if (activeTab) params.append("is_resale", activeTab === "buy" ? "0" : "1");
     if (selectedDistrict) params.append("district", selectedDistrict);
     if (selectedCity) params.append("city", selectedCity);
     if (budgetRange) params.append("budget", budgetRange);
     window.location.href = `/properties?${params.toString()}`;
-  };
-
-  const handleViewContact = () => {
-    if (!registeredUser) {
-      alert("Please login to view contact details");
-      return;
-    }
-    console.log("Lead saved for contact view");
   };
 
   return (
@@ -101,245 +81,224 @@ const HeroSection = ({ registeredUser }) => {
         onClose={() => setShowRegisterModal(false)}
         setShowLoginModal={setShowLoginModal}
       />
+
       <section
         id="home"
         style={{
+          width: "100vw", // full width, removes side white gaps
+          minHeight: "90vh",
           backgroundImage: "url('./Home.jpeg')",
-          backgroundPosition: "center",
           backgroundSize: "cover",
+          backgroundPosition: "center center",
           backgroundRepeat: "no-repeat",
-          color: "white",
-          padding: isMobile ? "60px 20px 30px" : "100px 20px 80px",
-          textAlign: "center",
-          position: "relative",
-          minHeight: isMobile ? "auto" : "100vh",
           display: "flex",
-          flexDirection: "column",
-          justifyContent: isMobile ? "flex-start" : "center",
+          justifyContent: "center",
           alignItems: "center",
+          flexDirection: "column",
+          position: "relative",
+          overflow: "hidden",
+          margin: 0,
+          padding: 0,
         }}
       >
-        {/* Alternative background overlay for better text readability */}
+        {/* Dark overlay for text clarity */}
         <div
           style={{
             position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
+            inset: 0,
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
             zIndex: 1,
           }}
         />
 
         <div
-          className="container"
           style={{
-            maxWidth: "900px",
-            margin: "0 auto",
-            padding: "0 20px",
             position: "relative",
             zIndex: 2,
+            textAlign: "center",
+            color: "white",
+            padding: "0 5px",
+            width: "100%",
+            maxWidth: "950px",
+            margin: "0 auto",
+            boxSizing: "border-box",
           }}
         >
-          <div
+          <h1
             style={{
-              background: "rgba(255, 255, 255, 0.95)",
-              backdropFilter: "blur(10px)",
-              borderRadius: "15px",
-              padding: breakpoint === "mobile" ? "12px" : "20px",
-              marginTop: "326px",
-              boxShadow: "0 20px 40px rgba(0,0,0,0.3)",
-              color: "#2c3e50",
-              border: "1px solid rgba(255, 255, 255, 0.3)",
-              width: "630px",
+              fontSize: "clamp(30px, 5vw, 46px)",
+              fontWeight: "800",
+              marginBottom: "10px",
+              textTransform: "uppercase",
             }}
           >
-            <div
-              style={{
-                display: "flex",
-                marginBottom: "15px",
-                borderRadius: "10px",
-                overflow: "hidden",
-                position: "relative",
-                background: "rgba(0, 0, 0, 0.05)",
-              }}
-            >
-              <div
-                style={{
-                  position: "absolute",
-                  top: 0,
-                  left: activeTab === "new" ? "0%" : "50%",
-                  width: "50%",
-                  height: "100%",
-                  background: "linear-gradient(135deg, #3498db, #2980b9)",
-                  transition: "all 0.3s ease",
-                  zIndex: 0,
-                  borderRadius: "8px",
-                }}
-              />
+            BRICKS TO BUILD YOUR PROPERTY
+          </h1>
 
-              {["new", "resale"].map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  style={{
-                    flex: 1,
-                    padding: "10px",
-                    background: "transparent",
-                    color: activeTab === tab ? "white" : "#2c3e50",
-                    border: "none",
-                    cursor: "pointer",
-                    fontWeight: "500",
-                    transition: "color 0.3s ease",
-                    zIndex: 1,
-                    position: "relative",
-                    textShadow: activeTab === tab ? "1px 1px 2px rgba(0,0,0,0.3)" : "none",
-                  }}
-                >
-                  {tab === "new" ? "New Properties" : "Resale"}
-                </button>
+          <p
+            style={{
+              fontSize: "clamp(15px, 2vw, 20px)",
+              fontWeight: "400",
+              marginBottom: "35px",
+            }}
+          >
+            Connecting Builders, Sellers, Buyers With Trust And Transparency
+          </p>
+
+          <h3
+            style={{
+              fontSize: "clamp(14px, 1.8vw, 18px)",
+              fontWeight: "600",
+              marginBottom: "18px",
+            }}
+          >
+            Search Properties For Buy And Sale
+          </h3>
+
+          {/* Top Row */}
+          <div
+            className="filter-row"
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              gap: "10px",
+              flexWrap: "wrap",
+              marginBottom: "15px",
+            }}
+          >
+            <select
+              value={activeTab}
+              onChange={(e) => setActiveTab(e.target.value)}
+              style={selectStyle}
+            >
+              <option value="buy">Buy</option>
+              <option value="rent">Rent</option>
+            </select>
+
+            <select
+              value={selectedDistrict}
+              onChange={(e) => setSelectedDistrict(e.target.value)}
+              style={selectStyle}
+            >
+              <option value="">Search By City</option>
+              {districts.map((d) => (
+                <option key={d.district_id} value={d.district_id}>
+                  {d.district_name}
+                </option>
               ))}
-            </div>
+            </select>
 
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-                gap: "12px",
-                marginBottom: "15px",
-              }}
-            >
-              <div>
-                <label style={{ display: "block", marginBottom: "5px", fontWeight: "500", fontSize: "0.9rem" }}></label>
-                <select
-                  value={selectedDistrict}
-                  onChange={(e) => setSelectedDistrict(e.target.value)}
-                  style={{
-                    padding: "10px",
-                    border: "2px solid #e9ecef",
-                    borderRadius: "8px",
-                    fontSize: "0.95rem",
-                    width: "100%",
-                    background: "white",
-                    transition: "border-color 0.3s ease",
-                  }}
-                >
-                  <option value="">Select City</option>
-                  {districts.map((d) => (
-                    <option key={d.district_id} value={d.district_id}>
-                      {d.district_name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label style={{ display: "block", marginBottom: "5px", fontWeight: "500", fontSize: "0.9rem" }}></label>
-                <select
-                  value={selectedCity}
-                  onChange={(e) => setSelectedCity(e.target.value)}
-                  style={{
-                    padding: "10px",
-                    border: "2px solid #e9ecef",
-                    borderRadius: "8px",
-                    fontSize: "0.95rem",
-                    width: "100%",
-                    background: "white",
-                    transition: "border-color 0.3s ease",
-                  }}
-                  disabled={!selectedDistrict}
-                >
-                  <option value="">{selectedDistrict ? "Select Locality" : "Select City First"}</option>
-                  {cities.map((c) => (
-                    <option key={c.city_id} value={c.city_id}>
-                      {c.city_name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label style={{ display: "block", marginBottom: "5px", fontWeight: "500", fontSize: "0.9rem" }}></label>
-                <select
-                  value={budgetRange}
-                  onChange={(e) => setBudgetRange(e.target.value)}
-                  style={{
-                    padding: "10px",
-                    border: "2px solid #e9ecef",
-                    borderRadius: "8px",
-                    fontSize: "0.95rem",
-                    width: "100%",
-                    background: "white",
-                    transition: "border-color 0.3s ease",
-                  }}
-                >
-                  <option value="">Budget Range</option>
-                  <option value="20L-50L">₹20L - ₹50L</option>
-                  <option value="50L-1Cr">₹50L - ₹1Cr</option>
-                  <option value="1Cr-2Cr">₹1Cr - ₹2Cr</option>
-                  <option value="2Cr+">₹2Cr+</option>
-                </select>
-              </div>
-            </div>
-            <button
-              onClick={handleSearch}
-              style={{
-                background: "linear-gradient(135deg, #3498db, #2980b9)",
-                border: "none",
-                padding: "12px 25px",
-                borderRadius: "25px",
-                fontWeight: "500",
-                color: "white",
-                fontSize: "1rem",
-                cursor: "pointer",
-                transition: "all 0.3s ease",
-                width: "50%",
-                boxShadow: "0 4px 15px rgba(52, 152, 219, 0.3)",
-                textShadow: "1px 1px 2px rgba(0,0,0,0.3)",
-              }}
-              onMouseOver={(e) => {
-                e.target.style.transform = "translateY(-2px)";
-                e.target.style.boxShadow = "0 6px 20px rgba(52, 152, 219, 0.4)";
-              }}
-              onMouseOut={(e) => {
-                e.target.style.transform = "translateY(0)";
-                e.target.style.boxShadow = "0 4px 15px rgba(52, 152, 219, 0.3)";
-              }}
-            >
-              <i className="fas fa-search"></i> Search Properties
+            <button style={searchBtn} onClick={handleSearch}>
+              Search
             </button>
-            {registeredUser && (
-              <button
-                onClick={handleViewContact}
-                style={{
-                  marginTop: "15px",
-                  background: "linear-gradient(135deg, #f39c12, #e67e22)",
-                  border: "none",
-                  padding: "10px 20px",
-                  borderRadius: "25px",
-                  fontWeight: "500",
-                  color: "white",
-                  fontSize: "0.95rem",
-                  cursor: "pointer",
-                  transition: "all 0.3s ease",
-                  boxShadow: "0 4px 15px rgba(243, 156, 18, 0.3)",
-                  textShadow: "1px 1px 2px rgba(0,0,0,0.3)",
-                }}
-                onMouseOver={(e) => {
-                  e.target.style.transform = "translateY(-2px)";
-                  e.target.style.boxShadow = "0 6px 20px rgba(243, 156, 18, 0.4)";
-                }}
-                onMouseOut={(e) => {
-                  e.target.style.transform = "translateY(0)";
-                  e.target.style.boxShadow = "0 4px 15px rgba(243, 156, 18, 0.3)";
-                }}
-              >
-                View Contact
-              </button>
-            )}
+          </div>
+
+          {/* Bottom Row */}
+          <div
+            className="filter-row"
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              gap: "10px",
+              flexWrap: "wrap",
+            }}
+          >
+            <select
+              value={selectedCity}
+              onChange={(e) => setSelectedCity(e.target.value)}
+              style={selectStyle}
+              disabled={!selectedDistrict}
+            >
+              <option value="">{selectedDistrict ? "Search By Locality" : "Select City First"}</option>
+              {cities.map((c) => (
+                <option key={c.city_id} value={c.city_id}>
+                  {c.city_name}
+                </option>
+              ))}
+            </select>
+
+            <select
+              value={budgetRange}
+              onChange={(e) => setBudgetRange(e.target.value)}
+              style={selectStyle}
+            >
+              <option value="">Property Type</option>
+              <option value="20L-50L">₹20L - ₹50L</option>
+              <option value="50L-1Cr">₹50L - ₹1Cr</option>
+              <option value="1Cr-2Cr">₹1Cr - ₹2Cr</option>
+              <option value="2Cr+">₹2Cr+</option>
+            </select>
           </div>
         </div>
+
+        <style>
+          {`
+            /* Mobile Responsive */
+            @media (max-width: 768px) {
+              #home {
+                background-position: center;
+                background-size: cover;
+                padding: 50px 0;
+              }
+              #home h1 {
+                font-size: 26px !important;
+                line-height: 1.3;
+              }
+              #home p {
+                font-size: 14px !important;
+              }
+              .filter-row {
+                flex-direction: column !important;
+                align-items: stretch !important;
+                width: 100% !important;
+                gap: 12px !important;
+              }
+              #home select, #home button {
+                width: 100% !important;
+              }
+            }
+
+            /* Remove horizontal scrollbars */
+            body, html {
+              margin: 0;
+              padding: 0;
+              overflow-x: hidden;
+            }
+          `}
+        </style>
       </section>
     </>
   );
+};
+
+/* Shared styles */
+const selectStyle = {
+  padding: "12px 15px",
+  borderRadius: "6px",
+  border: "none",
+  fontSize: "16px",
+  fontWeight: "500",
+  backgroundColor: "white",
+  minWidth: "200px",
+  color: "#333",
+  boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+  outline: "none",
+  cursor: "pointer",
+};
+
+const searchBtn = {
+  backgroundColor: "#f97316",
+  color: "white",
+  border: "none",
+  borderRadius: "6px",
+  padding: "12px 25px",
+  fontWeight: "600",
+  fontSize: "16px",
+  cursor: "pointer",
+  boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
+  transition: "all 0.3s ease",
 };
 
 export default HeroSection;
