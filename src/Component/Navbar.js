@@ -10,7 +10,7 @@ const Navbar = ({ setShowLoginModal, setShowPostPropertyModal, generalStatsdata 
   const breakpoint = useResponsive();
 
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 50);
+    const handleScroll = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
 
     const handleHashChange = () => setActiveHash(window.location.hash || "#home");
@@ -34,6 +34,7 @@ const Navbar = ({ setShowLoginModal, setShowPostPropertyModal, generalStatsdata 
   }, []);
 
   const handleNavClick = (e, href) => {
+    e.preventDefault();
     window.location.hash = href;
   };
 
@@ -47,11 +48,10 @@ const Navbar = ({ setShowLoginModal, setShowPostPropertyModal, generalStatsdata 
   };
 
   const links = [
-    // { href: "#home", label: "Home", icon: "fas fa-home" },
     { href: "/properties", label: "Find Properties", icon: "fas fa-building" },
     { href: "#brand-store", label: "Brand Store", icon: "fas fa-store" },
+    { href: "/interiors", label: "Interior", icon: "fas fa-couch" },
     { href: "/homeloan", label: "Home Loan", icon: "fas fa-university" },
-    { href: "/interiors", label: "Interiors", icon: "fas fa-couch" },
   ];
 
   const NavLinks = ({ isMobile = false }) => (
@@ -65,12 +65,14 @@ const Navbar = ({ setShowLoginModal, setShowPostPropertyModal, generalStatsdata 
               onClick={(e) => handleNavClick(e, href)}
               style={{
                 ...navLinkStyle,
+                fontSize: isMobile ? "1rem" : "1.05rem",
+                fontWeight: "600",
                 ...(isMobile
                   ? isActive
-                    ? { background: "#3498db", color: "white" }
+                    ? { background: "#007bff", color: "#fff" }
                     : {}
                   : isActive
-                  ? { borderBottom: "2px solid #f39c12" }
+                  ? { color: "#007bff", borderBottom: "2px solid #007bff" }
                   : {}),
               }}
             >
@@ -79,93 +81,99 @@ const Navbar = ({ setShowLoginModal, setShowPostPropertyModal, generalStatsdata 
           </li>
         );
       })}
-
-      <li>
-        <button
-          onClick={handlePostAssetClick}
-          className="glow-button"
-          style={{
-            ...postAssetButtonStyle,
-            background: "transparent",
-            border: "none",
-            cursor: "pointer",
-          }}
-        >
-          <i className="fas fa-plus-circle"></i> Post your property ( Free)
-        </button>
-      </li>
     </>
   );
 
   return (
     <nav
       style={{
-        background: isScrolled ? "rgba(44,62,80,0.95)" : "linear-gradient(135deg, #2c3e50, #3498db)",
-        padding: "1rem 0",
+        background: "#fff",
+        padding: "0.8rem 1.5rem",
         position: "fixed",
         top: 0,
         left: 0,
         right: 0,
         zIndex: 1000,
-        boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+        boxShadow: isScrolled ? "0 2px 8px rgba(0,0,0,0.1)" : "none",
         transition: "all 0.3s ease",
-        backdropFilter: isScrolled ? "blur(10px)" : "none",
       }}
     >
-      <div style={{ margin: "0 auto", padding: "0 20px" }}>
-        <div
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        {/* Logo */}
+        <a
+          href="#home"
           style={{
             display: "flex",
-            justifyContent: "space-between",
             alignItems: "center",
-            width: "100%",
+            gap: "10px",
+            textDecoration: "none",
           }}
         >
-           {/* Logo */}
-          <a href="#home" style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            {navData.logo_url ? (
+          {navData.logo_url ? (
+            <img
+              src={navData.logo_url}
+              alt={navData.site_name}
+              style={{ height: "45px", borderRadius: "6px" }}
+            />
+          ) : (
+            <>
               <img
-                src={navData.logo_url}
-                alt={navData.site_name}
-                style={{ height: breakpoint === "mobile" ? "50px" : "60px", borderRadius: "6px" }}
+                src="/adbricks-logo.png"
+                alt="Adbricks Logo"
+                style={{ height: "40px", borderRadius: "6px" }}
               />
-            ) : (
-              <i className="fas fa-home" style={{ color: "white", fontSize: "1.8rem" }} />
-            )}
-          </a>
+              <span
+                style={{
+                  fontWeight: "700",
+                  fontSize: "1.4rem",
+                  color: "#004aad",
+                  letterSpacing: "0.5px",
+                }}
+              >
+                Adbricks<span style={{ color: "#ff6f00" }}>.In</span>
+              </span>
+            </>
+          )}
+        </a>
 
-          <ul
-            className="desktop-menu"
-            style={{
-              display: "flex",
-              listStyle: "none",
-              gap: breakpoint === "smallLaptop" ? "10px" : "20px",
-              alignItems: "center",
-              margin: 0,
-              padding: 0,
-              width: breakpoint === "smallLaptop" ? "100%" : "70%",
-            }}
-          >
-            <NavLinks />
-          </ul>
+        {/* Desktop Links */}
+        <ul
+          className="desktop-menu"
+          style={{
+            display: "flex",
+            listStyle: "none",
+            gap: "1.8rem",
+            alignItems: "center",
+            margin: 0,
+            padding: 0,
+          }}
+        >
+          <NavLinks />
+          <li>
+            <button onClick={handlePostAssetClick} style={uploadBtnStyle}>
+              <i className="fas fa-upload"></i> Upload Property Free
+            </button>
+          </li>
+        </ul>
 
-          <div
-            className="hamburger"
-            onClick={() => setMenuOpen(!menuOpen)}
-            style={{
-              display: "none",
-              flexDirection: "column",
-              gap: "5px",
-              cursor: "pointer",
-            }}
-          >
-            <span style={hamburgerLine}></span>
-            <span style={hamburgerLine}></span>
-            <span style={hamburgerLine}></span>
-          </div>
+        {/* Hamburger Menu */}
+        <div
+          className="hamburger"
+          onClick={() => setMenuOpen(!menuOpen)}
+          style={{
+            display: "none",
+            flexDirection: "column",
+            gap: "5px",
+            cursor: "pointer",
+          }}
+        >
+          <span style={hamburgerLine}></span>
+          <span style={hamburgerLine}></span>
+          <span style={hamburgerLine}></span>
         </div>
       </div>
 
+      {/* Mobile Sidebar */}
       {menuOpen && (
         <div style={sidebarOverlay} onClick={() => setMenuOpen(false)}>
           <div style={sidebar} onClick={(e) => e.stopPropagation()}>
@@ -174,53 +182,60 @@ const Navbar = ({ setShowLoginModal, setShowPostPropertyModal, generalStatsdata 
             </button>
             <ul style={sidebarList}>
               <NavLinks isMobile />
+              <li>
+                <button onClick={handlePostAssetClick} style={mobileUploadBtn}>
+                  <i className="fas fa-upload"></i> Upload Property Free
+                </button>
+              </li>
             </ul>
           </div>
         </div>
       )}
 
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+      <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      />
     </nav>
   );
 };
 
-const navLinkStyle = {
-  color: "white",
-  textDecoration: "none",
-  fontWeight: "500",
-  padding: "8px 16px",
-  borderRadius: "20px",
-  transition: "all 0.3s ease",
-  display: "inline-flex",
-  alignItems: "center",
-  justifyContent: "center",
-  gap: "8px",
-  lineHeight: "1.5",
-  verticalAlign: "middle",
-};
+// ---------- STYLES ----------
 
-const postAssetButtonStyle = {
-  color: "white",
+const navLinkStyle = {
+  color: "#004aad",
   textDecoration: "none",
   fontWeight: "600",
-  padding: "10px 20px",
-  borderRadius: "25px",
+  padding: "8px 12px",
   transition: "all 0.3s ease",
   display: "inline-flex",
   alignItems: "center",
-  justifyContent: "center",
   gap: "8px",
-  lineHeight: "1.5",
-  verticalAlign: "middle",
-  background: "linear-gradient(135deg, #f39c12, #e74c3c)",
-  boxShadow: "0 0 20px rgba(243, 156, 18, 0.6)",
-  animation: "glow 2s ease-in-out infinite",
+};
+
+const uploadBtnStyle = {
+  background: "#ff6f00",
+  color: "#fff",
+  border: "none",
+  borderRadius: "25px",
+  padding: "10px 20px",
+  cursor: "pointer",
+  fontWeight: "700",
+  fontSize: "1rem",
+  transition: "all 0.3s ease",
+};
+
+const mobileUploadBtn = {
+  ...uploadBtnStyle,
+  width: "100%",
+  justifyContent: "center",
+  borderRadius: "8px",
 };
 
 const hamburgerLine = {
   width: "25px",
   height: "3px",
-  background: "white",
+  background: "#004aad",
   borderRadius: "3px",
 };
 
@@ -234,12 +249,11 @@ const sidebarOverlay = {
   zIndex: 1200,
   display: "flex",
   justifyContent: "flex-end",
-  height: "500px",
 };
 
 const sidebar = {
-  width: "260px",
-  background: "rgba(44,62,80,0.98)",
+  width: "250px",
+  background: "#fff",
   height: "100%",
   padding: "20px",
   display: "flex",
@@ -252,10 +266,10 @@ const closeBtn = {
   position: "absolute",
   top: "10px",
   right: "10px",
-  fontSize: "20px",
+  fontSize: "22px",
   background: "transparent",
   border: "none",
-  color: "white",
+  color: "#004aad",
   cursor: "pointer",
 };
 
@@ -278,19 +292,10 @@ styleSheet.innerHTML = `
     from { transform: translateX(100%); }
     to { transform: translateX(0); }
   }
-  @keyframes glow {
-    0%, 100% {
-      box-shadow: 0 0 20px rgba(243, 156, 18, 0.6), 0 0 30px rgba(243, 156, 18, 0.4);
-    }
-    50% {
-      box-shadow: 0 0 30px rgba(243, 156, 18, 0.8), 0 0 40px rgba(243, 156, 18, 0.6);
-    }
-  }
-  .glow-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 0 35px rgba(243, 156, 18, 0.9), 0 0 50px rgba(243, 156, 18, 0.7) !important;
+  button:hover {
+    transform: scale(1.05);
   }
 `;
 document.head.appendChild(styleSheet);
 
-export default Navbar
+export default Navbar;
