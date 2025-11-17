@@ -85,9 +85,9 @@ const HeroSection = ({ registeredUser }) => {
       <section
         id="home"
         style={{
-          width: "100vw", // full width, removes side white gaps
+          width: "100vw",
           minHeight: "90vh",
-          backgroundImage: "url('./Home.jpeg')",
+          backgroundImage: "url('./Home.png')",
           backgroundSize: "cover",
           backgroundPosition: "center center",
           backgroundRepeat: "no-repeat",
@@ -152,7 +152,7 @@ const HeroSection = ({ registeredUser }) => {
               marginBottom: "18px",
             }}
           >
-            Search Properties For Buy And Sale
+            Search Properties To Buy And Sell
           </h3>
 
           {/* Top Row */}
@@ -173,7 +173,7 @@ const HeroSection = ({ registeredUser }) => {
               style={selectStyle}
             >
               <option value="buy">Buy</option>
-              <option value="rent">Rent</option>
+              <option value="Sale">Sell</option>
             </select>
 
             <select

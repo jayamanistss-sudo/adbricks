@@ -56,7 +56,7 @@ const PropertyShowcase = ({ data }) => {
         if (Array.isArray(additional)) {
           images.push(...additional.filter(img => img?.trim()));
         }
-      } catch {}
+      } catch { }
     }
     return images;
   }, []);
@@ -85,7 +85,7 @@ const PropertyShowcase = ({ data }) => {
     const distance = touchStart - touchEnd;
     const isLeftSwipe = distance > minSwipeDistance;
     const isRightSwipe = distance < -minSwipeDistance;
-    
+
     if (isLeftSwipe) {
       navigate(1);
     } else if (isRightSwipe) {
@@ -110,7 +110,7 @@ const PropertyShowcase = ({ data }) => {
     return (
       <div
         style={{
-          background: 'rgba(255, 255, 255, 0.98)',
+          background: '#ECF4E8',
           borderRadius: isMobile ? '20px' : '20px',
           overflow: 'hidden',
           boxShadow: isMobile ? '0 10px 30px rgba(0,0,0,0.12)' : '0 20px 40px rgba(0,0,0,0.15)',
@@ -186,11 +186,11 @@ const PropertyShowcase = ({ data }) => {
                 <ChevronRight size={isMobile ? 18 : 18} color="rgb(44, 62, 80)" />
               </button>
 
-              <div style={{ 
-                position: 'absolute', 
-                bottom: isMobile ? '12px' : '10px', 
-                right: isMobile ? '12px' : '20px', 
-                display: 'flex', 
+              <div style={{
+                position: 'absolute',
+                bottom: isMobile ? '12px' : '10px',
+                right: isMobile ? '12px' : '20px',
+                display: 'flex',
                 gap: isMobile ? '6px' : '5px',
                 background: 'rgba(0, 0, 0, 0.4)',
                 padding: isMobile ? '6px 10px' : '4px 8px',
@@ -201,10 +201,10 @@ const PropertyShowcase = ({ data }) => {
                   <div
                     key={index}
                     style={{
-                      width: isMobile ? '7px' : '8px', 
+                      width: isMobile ? '7px' : '8px',
                       height: isMobile ? '7px' : '8px',
-                      borderRadius: '50%', 
-                      background: index === currentImageIndex ? 'rgba(255, 255, 255, 0.95)' : 'rgba(255, 255, 255, 0.4)', 
+                      borderRadius: '50%',
+                      background: index === currentImageIndex ? 'rgba(255, 255, 255, 0.95)' : 'rgba(255, 255, 255, 0.4)',
                       cursor: 'pointer',
                       transition: 'all 0.3s ease'
                     }}
@@ -219,35 +219,35 @@ const PropertyShowcase = ({ data }) => {
         <div style={{ padding: isMobile ? '24px 20px' : '25px', color: '#1a365d' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
             <Home size={isMobile ? 18 : 18} color="rgb(52, 152, 219)" />
-            <h3 style={{ 
-              fontSize: isMobile ? '1.25rem' : '1.3rem', 
-              fontWeight: '700', 
-              margin: 0, 
+            <h3 style={{
+              fontSize: isMobile ? '1.25rem' : '1.3rem',
+              fontWeight: '700',
+              margin: 0,
               lineHeight: '1.3',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap'
+              whiteSpace: 'nowrap',
+              color: '#000000',
             }}>
               {property.property_name}
             </h3>
           </div>
 
-          <div style={{ 
-            fontSize: isMobile ? "1.4rem" : "1.4rem", 
-            fontWeight: "800", 
-            color: "rgb(52, 152, 219)", 
+          <div style={{
+            fontSize: isMobile ? "1.4rem" : "1.4rem",
+            fontWeight: "800",
+            color: "rgb(52, 152, 219)",
             marginBottom: isMobile ? "24px" : "20px",
             letterSpacing: '-0.02em'
           }}>
             ₹{parseFloat(property.price_per_sqft || 0).toLocaleString("en-IN")}/sq ft
           </div>
-
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: '1fr 1fr', 
-            gap: isMobile ? '16px' : '15px', 
-            marginBottom: isMobile ? '24px' : '20px', 
-            fontSize: isMobile ? '0.85rem' : '0.9rem' 
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: isMobile ? '16px' : '15px',
+            marginBottom: isMobile ? '24px' : '20px',
+            fontSize: isMobile ? '0.85rem' : '0.9rem'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <div style={{
@@ -287,11 +287,11 @@ const PropertyShowcase = ({ data }) => {
               </div>
               <div style={{ minWidth: 0 }}>
                 <div style={{ color: '#64748b', fontSize: isMobile ? '0.75rem' : '0.8rem', marginBottom: '2px' }}>Owner</div>
-                <div style={{ 
-                  fontWeight: '700', 
-                  color: '#1a365d', 
-                  whiteSpace: 'nowrap', 
-                  overflow: 'hidden', 
+                <div style={{
+                  fontWeight: '700',
+                  color: '#1a365d',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
                   textOverflow: 'ellipsis',
                   fontSize: isMobile ? '0.9rem' : '0.85rem'
                 }}>
@@ -299,18 +299,75 @@ const PropertyShowcase = ({ data }) => {
                 </div>
               </div>
             </div>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
+                marginBottom: isMobile ? '20px' : '18px',
+                fontSize: isMobile ? '0.95rem' : '1rem',
+                fontWeight: '700',
+                color: '#1a365d'
+              }}
+            >
+              {(() => {
+                const builtupData = property.builtup_area_sqft;
+                let allNumbers = [];
+
+                try {
+                  let parsedData = builtupData;
+                  if (typeof builtupData === 'string') {
+                    parsedData = JSON.parse(builtupData);
+                  }
+
+                  if (Array.isArray(parsedData)) {
+                    parsedData.forEach(val => {
+                      if (typeof val === 'string') {
+                        const nums = val
+                          .replace(/\s+/g, '')
+                          .split('-')
+                          .map(n => parseFloat(n))
+                          .filter(n => !isNaN(n));
+                        allNumbers.push(...nums);
+                      }
+                    });
+                  } else if (typeof parsedData === 'object' && parsedData !== null) {
+                    Object.values(parsedData).forEach(val => {
+                      if (typeof val === 'string') {
+                        const nums = val
+                          .replace(/\s+/g, '')
+                          .split('-')
+                          .map(n => parseFloat(n))
+                          .filter(n => !isNaN(n));
+                        allNumbers.push(...nums);
+                      }
+                    });
+                  }
+                } catch (error) { }
+
+                const validNumbers = allNumbers.filter(n => !isNaN(n) && n > 0);
+
+                if (validNumbers.length > 0) {
+                  const min = Math.min(...validNumbers);
+                  const max = Math.max(...validNumbers);
+                  return <span>{min === max ? `${min} Sq.ft` : `${min} - ${max} Sq.ft`}</span>;
+                } else {
+                  return 'N/A';
+                }
+              })()}
+            </div>
           </div>
 
           <button
             style={{
               background: 'linear-gradient(135deg, rgb(44, 62, 80), rgb(52, 152, 219))',
-              border: 'none', 
+              border: 'none',
               padding: isMobile ? '16px 24px' : '14px 24px',
-              borderRadius: '30px', 
-              fontWeight: '700', 
+              borderRadius: '30px',
+              fontWeight: '700',
               color: 'white',
-              cursor: 'pointer', 
-              width: '100%', 
+              cursor: 'pointer',
+              width: '100%',
               fontSize: isMobile ? '1rem' : '0.95rem',
               boxShadow: '0 4px 12px rgba(52, 152, 219, 0.3)',
               transition: 'transform 0.2s ease',
@@ -329,9 +386,9 @@ const PropertyShowcase = ({ data }) => {
 
   return (
     <section
-      style={{ 
-        padding: isMobile ? '50px 0 60px' : '100px 0', 
-        background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)', 
+      style={{
+        padding: isMobile ? '50px 0 60px' : '100px 0',
+        background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
         position: 'relative',
         minHeight: isMobile ? '100vh' : 'auto'
       }}
@@ -341,43 +398,55 @@ const PropertyShowcase = ({ data }) => {
       onTouchMove={isMobile ? onTouchMove : undefined}
       onTouchEnd={isMobile ? onTouchEnd : undefined}
     >
-      <div style={{ 
-        maxWidth: '1400px', 
-        margin: '0 auto', 
-        padding: isMobile ? '0 20px' : '0 20px' 
+      <div style={{
+        maxWidth: '1400px',
+        margin: '0 auto',
+        padding: isMobile ? '0 20px' : '0 20px'
       }}>
         <div style={{ textAlign: 'center', marginBottom: isMobile ? '36px' : '60px' }}>
-          <h2 style={{
-            fontSize: isMobile ? '2.2rem' : '3rem', 
-            marginBottom: isMobile ? '12px' : '15px', 
-            fontWeight: '800',
-            background: 'linear-gradient(135deg, rgb(44, 62, 80), rgb(52, 152, 219))',
-            WebkitBackgroundClip: 'text', 
-            WebkitTextFillColor: 'transparent',
-            lineHeight: '1.2',
-            letterSpacing: '-0.02em'
-          }}>
+          <h2
+            style={{
+              fontFamily: 'Poppins, sans-serif',
+              fontWeight: 700,
+              fontSize: isMobile ? '2.2rem' : '3rem',
+              marginBottom: isMobile ? '12px' : '15px',
+              lineHeight: '1',
+              letterSpacing: '0.01em',
+              textAlign: 'center',
+              textTransform: 'capitalize',
+              color: '#1055C9' // new text color
+            }}
+          >
             Premium Properties
           </h2>
-          <p style={{
-            fontSize: isMobile ? '1.05rem' : '1.2rem', 
-            color: '#64748b',
-            maxWidth: '600px', 
-            margin: '0 auto', 
-            lineHeight: '1.6',
-            padding: isMobile ? '0 10px' : '0'
-          }}>
+          <p
+            style={{
+              fontFamily: 'Poppins, sans-serif',
+              fontWeight: 400,
+              fontStyle: 'normal',
+              fontSize: isMobile ? '1.05rem' : '1.2rem',
+              color: '#000000',
+              maxWidth: '600px',
+              margin: '0 auto',
+              lineHeight: '1',
+              letterSpacing: '0.01em',
+              textAlign: 'center',
+              textTransform: 'capitalize',
+              padding: isMobile ? '0 10px' : '0'
+            }}
+          >
             Discover exceptional properties from our handpicked premium collection
           </p>
+
         </div>
 
         {!properties.length ? (
-          <div style={{ 
-            textAlign: 'center', 
-            color: '#64748b', 
-            fontSize: isMobile ? '1.05rem' : '1.2rem', 
-            padding: isMobile ? '50px 20px' : '60px', 
-            background: 'rgba(255, 255, 255, 0.8)', 
+          <div style={{
+            textAlign: 'center',
+            color: '#64748b',
+            fontSize: isMobile ? '1.05rem' : '1.2rem',
+            padding: isMobile ? '50px 20px' : '60px',
+            background: 'rgba(255, 255, 255, 0.8)',
             borderRadius: isMobile ? '16px' : '20px',
             margin: isMobile ? '0 10px' : '0'
           }}>
@@ -386,18 +455,18 @@ const PropertyShowcase = ({ data }) => {
         ) : (
           <div style={{ position: 'relative' }}>
             <div style={{
-              display: 'flex', 
-              gap: isMobile ? '0' : '30px', 
+              display: 'flex',
+              gap: isMobile ? '0' : '30px',
               justifyContent: 'center',
-              alignItems: 'stretch', 
+              alignItems: 'stretch',
               overflowX: isMobile ? 'visible' : 'visible',
               scrollSnapType: 'none',
               paddingBottom: isMobile ? '20px' : '0'
             }}>
               {getVisibleCards().map((property, index) => (
-                <div 
-                  key={`${property.property_id}-${currentSlide}-${index}`} 
-                  style={{ 
+                <div
+                  key={`${property.property_id}-${currentSlide}-${index}`}
+                  style={{
                     scrollSnapAlign: 'none',
                     flexShrink: isMobile ? 0 : 1,
                     width: isMobile ? '100%' : 'auto'
@@ -413,19 +482,19 @@ const PropertyShowcase = ({ data }) => {
                 <button
                   onClick={() => navigate(-1)}
                   style={{
-                    position: 'absolute', 
-                    left: isMobile ? '-10px' : '-80px', 
-                    top: '50%', 
+                    position: 'absolute',
+                    left: isMobile ? '-10px' : '-80px',
+                    top: '50%',
                     transform: 'translateY(-50%)',
-                    background: 'rgba(255, 255, 255, 0.98)', 
+                    background: 'rgba(255, 255, 255, 0.98)',
                     border: '2px solid rgba(52, 152, 219, 0.2)',
-                    borderRadius: '50%', 
-                    width: isMobile ? '44px' : '70px', 
+                    borderRadius: '50%',
+                    width: isMobile ? '44px' : '70px',
                     height: isMobile ? '44px' : '70px',
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    justifyContent: 'center', 
-                    cursor: 'pointer', 
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
                     zIndex: 10,
                     boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
                     transition: 'all 0.2s ease'
@@ -439,19 +508,19 @@ const PropertyShowcase = ({ data }) => {
                 <button
                   onClick={() => navigate(1)}
                   style={{
-                    position: 'absolute', 
-                    right: isMobile ? '-10px' : '-80px', 
-                    top: '50%', 
+                    position: 'absolute',
+                    right: isMobile ? '-10px' : '-80px',
+                    top: '50%',
                     transform: 'translateY(-50%)',
-                    background: 'rgba(255, 255, 255, 0.98)', 
+                    background: 'rgba(255, 255, 255, 0.98)',
                     border: '2px solid rgba(52, 152, 219, 0.2)',
-                    borderRadius: '50%', 
-                    width: isMobile ? '44px' : '70px', 
+                    borderRadius: '50%',
+                    width: isMobile ? '44px' : '70px',
                     height: isMobile ? '44px' : '70px',
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    justifyContent: 'center', 
-                    cursor: 'pointer', 
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
                     zIndex: 10,
                     boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
                     transition: 'all 0.2s ease'

@@ -23,63 +23,34 @@ const BrandStoreSection = ({ data }) => {
   }, []);
 
   useEffect(() => {
+    if (!isAutoPlaying || builders.length <= 1) return;
     const timer = setInterval(() => {
       setCurrentSlide(prev => (prev + 1) % builders.length);
     }, 5000);
     return () => clearInterval(timer);
   }, [isAutoPlaying, builders.length]);
 
-  const getCards = () => {
-    if (!builders.length) return [];
-    const cardsToShow = isMobile ? 1 : Math.min(3, builders.length);
-    return [...Array(cardsToShow)].map((_, i) => ({
-      ...builders[(currentSlide + i) % builders.length],
-      pos: i
-    }));
-  };
-
-  const truncateText = (text, limit = 80) => text?.length > limit ? text.slice(0, limit) + '...' : text;
-
   const handleImageError = (builderId) => {
     setImageErrors(prev => new Set([...prev, builderId]));
   };
 
-  const cardStyle = pos => ({
-    background: 'linear-gradient(135deg, rgba(255,255,255,0.98), rgba(248,250,252,0.98))',
-    borderRadius: isMobile ? '16px' : '24px',
-    overflow: 'hidden',
-    boxShadow: isMobile
-      ? '0 15px 30px rgba(0,0,0,0.2)'
-      : (pos === 1 ? '0 30px 60px rgba(0,0,0,0.25)' : '0 20px 40px rgba(0,0,0,0.15)'),
-    transition: 'all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-    cursor: 'pointer',
-    backdropFilter: 'blur(20px)',
-    border: '2px solid rgba(52, 152, 219, 0.2)',
-    width: isMobile ? 'calc(100vw - 60px)' : '380px',
-    maxWidth: isMobile ? '350px' : '380px',
-    minWidth: isMobile ? '280px' : '320px',
-    margin: isMobile ? '0 auto' : '0',
-    transform: isMobile
-      ? 'scale(1)'
-      : `scale(${pos === 1 ? 1.05 : 0.95}) translateY(${pos === 1 ? '-10px' : '5px'}) rotateY(${pos === 0 ? '3deg' : pos === 2 ? '-3deg' : '0'})`,
-    zIndex: pos === 1 ? 20 : 10
-  });
+  const currentBuilder = builders[currentSlide] || {};
 
   const btnStyle = {
-    position: 'absolute',
-    top: '50%',
-    transform: 'translateY(-50%)',
-    background: 'linear-gradient(135deg, white, #f8fafc)',
-    border: '2px solid rgba(52, 152, 219, 0.3)',
+    background: '#FF6B35',
+    border: 'none',
     borderRadius: '50%',
-    width: isMobile ? '45px' : '55px',
-    height: isMobile ? '45px' : '55px',
-    fontSize: isMobile ? '18px' : '24px',
-    color: '#2c3e50',
+    width: isMobile ? '40px' : '50px',
+    height: isMobile ? '40px' : '50px',
+    fontSize: isMobile ? '22px' : '28px',
+    color: 'white',
     cursor: 'pointer',
-    boxShadow: '0 8px 20px rgba(0,0,0,0.1)',
+    boxShadow: '0 4px 15px rgba(255, 107, 53, 0.4)',
     transition: 'all 0.3s ease',
-    zIndex: 30
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontWeight: 'bold'
   };
 
   function handleView(name) {
@@ -88,100 +59,194 @@ const BrandStoreSection = ({ data }) => {
     window.location.href = `/properties?${params.toString()}`;
   }
 
+  const defaultDescription = 'A premier real estate developer committed to creating exceptional living spaces that blend modern design with quality craftsmanship.';
+
   return (
     <section
       id="brand-store"
       onMouseEnter={() => !isMobile && setIsAutoPlaying(false)}
       onMouseLeave={() => !isMobile && setIsAutoPlaying(true)}
       style={{
-        padding: isMobile ? '40px 0' : '80px 0',
+        padding: isMobile ? '30px 15px' : '60px 20px',
         background: 'linear-gradient(180deg, #f8fafc, white)',
         position: 'relative'
       }}
     >
-      <div style={{
-        maxWidth: '1400px',
-        margin: '0 auto',
-        padding: isMobile ? '0 15px' : '0 20px'
-      }}>
-        <div style={{ textAlign: 'center', marginBottom: isMobile ? '40px' : '70px' }}>
+      <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+        <div style={{ textAlign: 'center', marginBottom: isMobile ? '25px' : '40px' }}>
           <h2 style={{
-            fontSize: isMobile ? '2rem' : '3rem',
-            background: 'linear-gradient(135deg, #2c3e50, #3498db)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            marginBottom: '15px',
-            fontWeight: '800',
-            lineHeight: '1.2'
+            fontSize: isMobile ? '1.8rem' : '2.2rem',
+            color: '#0056D2',
+            marginBottom: '10px',
+            fontWeight: '700'
           }}>
             Brand Store
           </h2>
           <p style={{
-            fontSize: isMobile ? '1.1rem' : '1.3rem',
-            color: '#64748b',
-            maxWidth: '600px',
-            margin: '0 auto',
-            padding: isMobile ? '0 10px' : '0'
+            fontSize: isMobile ? '0.95rem' : '1.05rem',
+            color: '#000'
           }}>
-            Premium verified builders with exclusive project deals
+            Premium Verified Builders With Exclusive Project Deals
           </p>
         </div>
 
         {!builders.length ? (
-          <div style={{ textAlign: 'center', padding: isMobile ? '40px 20px' : '60px', fontSize: isMobile ? '1.1rem' : '1.2rem', color: '#94a3b8', background: 'linear-gradient(135deg, #f1f5f9, #e2e8f0)', borderRadius: isMobile ? '16px' : '20px', margin: isMobile ? '0 10px' : '0' }}>
+          <div style={{
+            textAlign: 'center',
+            padding: '40px 20px',
+            fontSize: '1.1rem',
+            color: '#94a3b8',
+            background: '#f1f5f9',
+            borderRadius: '100px'
+          }}>
             No brands available
           </div>
         ) : (
           <div style={{ position: 'relative' }}>
-            <div style={{ display: 'flex', gap: isMobile ? '0' : '30px', justifyContent: 'center', padding: isMobile ? '10px 0' : '20px 0', flexWrap: isMobile ? 'nowrap' : 'wrap', overflowX: isMobile ? 'visible' : 'visible' }}>
-              {getCards().map((builder, idx) => (
-                <div key={`${builder.id}-${idx}`} style={cardStyle(builder.pos)}>
-                  <div style={{ height: isMobile ? '180px' : '220px', position: 'relative', background: 'linear-gradient(135deg, #f8fafc, #e2e8f0)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-                    {builder.logo_url && !imageErrors.has(builder.id) ? (
-                      <div style={{ width: '100%', height: '100%', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'white' }}>
-                        <img src={builder.logo_url} alt={builder.name || 'Brand logo'} onError={() => handleImageError(builder.id)} style={{ width: 'auto', height: 'auto', maxWidth: '90%', maxHeight: '90%', objectFit: 'contain', objectPosition: 'center', transition: 'all 0.3s ease', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
-                      </div>
-                    ) : (
-                      <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', background: 'linear-gradient(135deg, #e2e8f0, #cbd5e1)', color: '#64748b' }}>
-                        <div style={{ width: isMobile ? '60px' : '80px', height: isMobile ? '60px' : '80px', borderRadius: '50%', background: 'linear-gradient(135deg, #94a3b8, #64748b)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: isMobile ? '1.5rem' : '2rem', fontWeight: '700', color: 'white', marginBottom: '10px' }}>
-                          {builder.name?.charAt(0) || '?'}
-                        </div>
-                        <span style={{ fontSize: isMobile ? '0.8rem' : '0.9rem', fontWeight: '600', textAlign: 'center' }}>
-                          {builder.name || 'Brand'}
-                        </span>
-                      </div>
-                    )}
-                    <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, transparent 60%, rgba(0,0,0,0.1))' }} />
-                    <span style={{ position: 'absolute', top: isMobile ? 12 : 15, right: isMobile ? 12 : 15, background: 'linear-gradient(135deg, #10b981, #059669)', color: 'white', padding: isMobile ? '5px 12px' : '6px 14px', borderRadius: '20px', fontSize: isMobile ? '0.7rem' : '0.75rem', fontWeight: '700', boxShadow: '0 2px 8px rgba(16, 185, 129, 0.3)' }}>
-                      ✓ Verified
-                    </span>
+            <div style={{
+              background: '#bde3c3',
+              borderRadius: isMobile ? '14px' : '20px',
+              border: '4px solid #bde3c3',
+              overflow: 'hidden',
+              boxShadow: '0 10px 30px rgba(0, 0, 0, 0.08)',
+              display: 'flex',
+              flexDirection: isMobile ? 'column' : 'row',
+              width: isMobile ? '100%' : '900px',
+              height: isMobile ? 'auto' : '260px',
+              margin: '0 auto'
+            }}>
+              <div style={{
+                flex: isMobile ? '1' : '0 0 350px',
+                width: isMobile ? '100%' : '350px',
+                position: 'relative',
+                minHeight: isMobile ? '200px' : '260px',
+                background: 'white',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '20px'
+              }}>
+                {currentBuilder?.logo_url && !imageErrors.has(currentBuilder.id) ? (
+                  <img
+                    src={currentBuilder.logo_url}
+                    alt={currentBuilder.name || 'Brand'}
+                    onError={() => handleImageError(currentBuilder.id)}
+                    style={{
+                      maxWidth: '100%',
+                      maxHeight: '100%',
+                      objectFit: 'contain',
+                      objectPosition: 'center'
+                    }}
+                  />
+                ) : (
+                  <div style={{
+                    width: '100%',
+                    height: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    color: 'white',
+                    fontSize: isMobile ? '3rem' : '4rem',
+                    fontWeight: '700'
+                  }}>
+                    {currentBuilder?.name?.charAt(0) || '?'}
                   </div>
-                  <div style={{ padding: isMobile ? '20px' : '25px' }}>
-                    <h3 style={{ fontSize: isMobile ? '1.2rem' : '1.4rem', fontWeight: '800', marginBottom: '12px', background: 'linear-gradient(135deg, #0f172a, #334155)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                      {builder.name}
-                    </h3>
-                    <p style={{ color: '#64748b', marginBottom: '20px', fontSize: isMobile ? '0.9rem' : '0.95rem', lineHeight: '1.6', minHeight: isMobile ? 'auto' : '48px' }}>
-                      {truncateText(builder.description, isMobile ? 60 : 80)}
-                    </p>
-                    <button style={{ background: 'linear-gradient(135deg, #3498db, #2c3e50)', border: 'none', padding: isMobile ? '10px 20px' : '12px 24px', borderRadius: '25px', color: 'white', fontSize: isMobile ? '0.9rem' : '0.95rem', fontWeight: '700', cursor: 'pointer', width: '100%', transition: 'all 0.3s ease', boxShadow: '0 4px 15px rgba(52,152,219,0.3)' }} onClick={() => handleView(builder.name)}>
-                      View Projects →
-                    </button>
-                  </div>
-                </div>
-              ))}
+                )}
+              </div>
+
+              <div style={{
+                flex: 1,
+                padding: isMobile ? '20px' : '25px 30px',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center'
+              }}>
+                <h3 style={{
+                  fontSize: isMobile ? '1.4rem' : '1.7rem',
+                  fontWeight: '700',
+                  color: '#000',
+                  marginBottom: '12px'
+                }}>
+                  {currentBuilder?.name || 'Brand Name'}
+                </h3>
+
+                <p style={{
+                  color: '#2d5016',
+                  fontSize: isMobile ? '0.85rem' : '0.9rem',
+                  lineHeight: '1.5',
+                  marginBottom: '18px'
+                }}>
+                  {currentBuilder?.description || defaultDescription}
+                </p>
+
+                <button
+                  onClick={() => handleView(currentBuilder?.name || currentBuilder?.id)}
+                  style={{
+                    background: '#0056D2',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '6px',
+                    padding: isMobile ? '9px 20px' : '10px 24px',
+                    fontSize: isMobile ? '0.85rem' : '0.95rem',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    alignSelf: 'flex-start'
+                  }}
+                >
+                  View Properties
+                </button>
+              </div>
             </div>
 
             {builders.length > 1 && (
-              <>
-                <button onClick={() => navigate(-1)} style={{ ...btnStyle, left: isMobile ? 10 : -60 }}>‹</button>
-                <button onClick={() => navigate(1)} style={{ ...btnStyle, right: isMobile ? 10 : -60 }}>›</button>
-              </>
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                position: 'absolute',
+                top: '50%',
+                left: isMobile ? '5px' : '-60px',
+                right: isMobile ? '5px' : '-60px',
+                transform: 'translateY(-50%)',
+                pointerEvents: 'none'
+              }}>
+                <button
+                  onClick={() => navigate(-1)}
+                  style={{ ...btnStyle, pointerEvents: 'auto' }}
+                >
+                  ‹
+                </button>
+                <button
+                  onClick={() => navigate(1)}
+                  style={{ ...btnStyle, pointerEvents: 'auto' }}
+                >
+                  ›
+                </button>
+              </div>
             )}
 
-            {isMobile && builders.length > 1 && (
-              <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '20px' }}>
+            {builders.length > 1 && (
+              <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+                gap: '8px',
+                marginTop: '20px'
+              }}>
                 {builders.map((_, index) => (
-                  <button key={index} onClick={() => setCurrentSlide(index)} style={{ width: '10px', height: '10px', borderRadius: '50%', border: 'none', background: index === currentSlide ? 'linear-gradient(135deg, #3498db, #2c3e50)' : 'rgba(52, 152, 219, 0.3)', cursor: 'pointer', transition: 'all 0.3s ease' }} />
+                  <button
+                    key={index}
+                    onClick={() => setCurrentSlide(index)}
+                    style={{
+                      width: '10px',
+                      height: '10px',
+                      borderRadius: '50%',
+                      border: 'none',
+                      background: index === currentSlide ? '#0056D2' : '#ccc',
+                      cursor: 'pointer',
+                      transition: 'all 0.3s ease'
+                    }}
+                  />
                 ))}
               </div>
             )}

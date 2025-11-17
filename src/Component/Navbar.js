@@ -35,7 +35,7 @@ const Navbar = ({ setShowLoginModal, setShowPostPropertyModal, generalStatsdata 
 
   const handleNavClick = (e, href) => {
     e.preventDefault();
-    window.location.hash = href;
+    window.location = href;
   };
 
   const handlePostAssetClick = () => {
@@ -48,11 +48,12 @@ const Navbar = ({ setShowLoginModal, setShowPostPropertyModal, generalStatsdata 
   };
 
   const links = [
-    { href: "/properties", label: "Find Properties", icon: "fas fa-building" },
-    { href: "#brand-store", label: "Brand Store", icon: "fas fa-store" },
-    { href: "/interiors", label: "Interior", icon: "fas fa-couch" },
-    { href: "/homeloan", label: "Home Loan", icon: "fas fa-university" },
+    { href: "/properties", label: "Find Properties", icon: "/homeaction.png" },
+    { href: "#brand-store", label: "Brand Store", icon: "/store.png" },
+    { href: "/interiors", label: "Interior", icon: "/homeint.png" },
+    { href: "/homeloan", label: "Home Loan", icon: "/homolones.png" },
   ];
+
 
   const NavLinks = ({ isMobile = false }) => (
     <>
@@ -72,11 +73,20 @@ const Navbar = ({ setShowLoginModal, setShowPostPropertyModal, generalStatsdata 
                     ? { background: "#007bff", color: "#fff" }
                     : {}
                   : isActive
-                  ? { color: "#007bff", borderBottom: "2px solid #007bff" }
-                  : {}),
+                    ? { color: "#007bff", borderBottom: "2px solid #007bff" }
+                    : {}),
               }}
             >
-              <i className={icon}></i> {label}
+              <img
+                src={icon}
+                alt={label}
+                style={{
+                  width: "22px",
+                  height: "22px",
+                  objectFit: "contain",
+                }}
+              />{" "}
+              {label}
             </a>
           </li>
         );
@@ -151,8 +161,30 @@ const Navbar = ({ setShowLoginModal, setShowPostPropertyModal, generalStatsdata 
           <NavLinks />
           <li>
             <button onClick={handlePostAssetClick} style={uploadBtnStyle}>
-              <i className="fas fa-upload"></i> Upload Property Free
+              <img
+                src="/add.png"
+                alt="Upload Icon"
+                style={{ width: "20px", height: "20px", marginRight: "8px" }}
+              />
+
+              <span style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                Upload Property
+                <span
+                  style={{
+                    background: "#FFA65A",
+                    color: "white",
+                    padding: "3px 8px",
+                    borderRadius: "6px",
+                    fontSize: "0.75rem",
+                    fontWeight: "700"
+                  }}
+                >
+                  FREE
+                </span>
+
+              </span>
             </button>
+
           </li>
         </ul>
 
@@ -184,18 +216,18 @@ const Navbar = ({ setShowLoginModal, setShowPostPropertyModal, generalStatsdata 
               <NavLinks isMobile />
               <li>
                 <button onClick={handlePostAssetClick} style={mobileUploadBtn}>
-                  <i className="fas fa-upload"></i> Upload Property Free
+                  <img
+                    src="/upload-icon.png"
+                    alt="Upload Icon"
+                    style={{ width: "20px", height: "20px", marginRight: "8px" }}
+                  />
+                  Upload Property Free
                 </button>
               </li>
             </ul>
           </div>
         </div>
       )}
-
-      <link
-        rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
-      />
     </nav>
   );
 };
@@ -223,6 +255,8 @@ const uploadBtnStyle = {
   fontWeight: "700",
   fontSize: "1rem",
   transition: "all 0.3s ease",
+  display: "flex",
+  alignItems: "center",
 };
 
 const mobileUploadBtn = {

@@ -780,13 +780,14 @@ export default function Home() {
                 getPropertyTypeOptions={getPropertyTypeOptions}
                 showBHKSelector={showBHKSelector}
             />
-            <FeaturesSection />
+            {/* <FeaturesSection /> */}
             {/* <StatsSection ref={statsRef} animatedStats={animatedStats} /> */}
             <BrandStoreSection data={brandStore} />
             <PropertyShowcase data={propertyList} />
             <PropertiesSection data={propertyList} />
-            {/* <AboutSection  data={generalStatsdata}/> */}
+            <AboutSection  data={generalStatsdata}/>
             <HowItWorksSection />
+            
             <Footer data={generalStatsdata} />
             {/* <FloatingCTA showFloatingCTA={showFloatingCTA} setShowPostPropertyModal={setShowPostPropertyModal} /> */}
 

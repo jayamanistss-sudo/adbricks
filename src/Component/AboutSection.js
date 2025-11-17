@@ -1,288 +1,176 @@
-import React, { useState, useEffect } from "react";
+import React from 'react';
 
-const AboutSection = ({ data }) => {
-  const [aboutData, setAboutData] = useState('');
-
-  useEffect(() => {
-    if (data?.data?.[0].about_us) {
-      setAboutData(data?.data?.[0].about_us);
+const PropertyTypeSection = () => {
+  const propertyTypes = [
+    {
+      title: "APARTMENTS",
+      projects: "1000 + Projects",
+      image: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&q=80",
+      bgColor: "#FFE893"
+    },
+    {
+      title: "VILLAS",
+      projects: "500 + Projects",
+      image: "https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800&q=80",
+      bgColor: "#FFE893"
+    },
+    {
+      title: "PLOTS",
+      projects: "3000 + Projects",
+      image: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&q=80",
+      bgColor: "#FFE893"
+    },
+    {
+      title: "COMMERCIAL",
+      projects: "500 + Projects",
+      image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&q=80",
+      bgColor: "#FFE893"
     }
-  }, [data]);
-
-  const achievements = [
-    { number: "20+", label: "Years Experience" },
-    { number: "500+", label: "Successful Campaigns" },
-    { number: "100+", label: "Happy Clients" },
-    { number: "24/7", label: "Support Available" }
   ];
 
   return (
-    <section id="about" style={{
-      padding: "100px 0",
+    <section style={{
+      padding: "50px 20px",
       background: "linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)",
       position: "relative"
     }}>
       <div style={{
-        position: "absolute",
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.03'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-        opacity: 0.5
-      }} />
-
-      <div style={{
-        maxWidth: "1400px",
-        margin: "0 auto",
-        padding: "0 20px",
-        position: "relative",
-        zIndex: 1
+        maxWidth: "1100px",
+        margin: "0 auto"
       }}>
         <div style={{
           textAlign: "center",
-          marginBottom: "80px"
+          marginBottom: "40px"
         }}>
-          <div style={{
-            display: "inline-block",
-            background: "linear-gradient(135deg, #3498db, #2c3e50)",
-            padding: "8px 24px",
-            borderRadius: "25px",
-            color: "white",
-            fontSize: "0.9rem",
-            fontWeight: "600",
-            marginBottom: "20px",
-            textTransform: "uppercase",
-            letterSpacing: "0.5px"
-          }}>
-            About Our Company
-          </div>
           <h2 style={{
-            fontSize: "3.5rem",
-            background: "linear-gradient(135deg, #2c3e50, #3498db)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-            backgroundClip: "text",
-            marginBottom: "20px",
-            fontWeight: "800",
-            lineHeight: "1.2"
+            fontSize: "2.2rem",
+            color: "#0066CC",
+            marginBottom: "8px",
+            fontWeight: "700"
           }}>
-            ADBRICKS MEDIA
+            Explore By Property Type
           </h2>
           <p style={{
-            fontSize: "1.3rem",
-            color: "#6c757d",
-            fontWeight: "400",
-            maxWidth: "800px",
-            margin: "0 auto",
-            lineHeight: "1.6"
+            fontSize: "1rem",
+            color: "#666",
+            fontWeight: "400"
           }}>
-            Leading advertisement company driving business growth through innovative strategies
+            Largest Consolidation Of 'exclusive' Plots In Your City
           </p>
         </div>
 
         <div style={{
           display: "grid",
-          gridTemplateColumns: "1fr",
-          gap: "60px",
-          alignItems: "start",
-          marginBottom: "80px"
+          gridTemplateColumns: "repeat(2, 1fr)",
+          gap: "30px"
         }}
-        className="main-grid">
-          <div>
-            <div style={{
-              background: "white",
-              borderRadius: "20px",
-              padding: "40px",
-              boxShadow: "0 15px 35px rgba(0,0,0,0.1)",
-              border: "1px solid rgba(255,255,255,0.8)",
-              marginBottom: "30px"
-            }}>
-              <div style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "15px",
-                marginBottom: "25px"
-              }}>
-                <div style={{
-                  background: "linear-gradient(135deg, #3498db, #2c3e50)",
-                  borderRadius: "50%",
-                  width: "50px",
-                  height: "50px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center"
-                }}>
-                  <i className="fas fa-building" style={{ color: "white", fontSize: "1.2rem" }}></i>
-                </div>
-                <h3 style={{
-                  color: "#2c3e50",
-                  fontSize: "1.8rem",
-                  margin: 0,
-                  fontWeight: "700"
-                }}>
-                  Industry Leadership
-                </h3>
-              </div>
-              
-              {aboutData ? (
-                <div style={{
-                  lineHeight: "1.8",
-                  color: "#6c757d",
-                  fontSize: "1.1rem"
-                }}
-                dangerouslySetInnerHTML={{ __html: aboutData }}
-                />
-              ) : (
-                <>
-                  <p style={{
-                    lineHeight: "1.8",
-                    color: "#6c757d",
-                    fontSize: "1.1rem",
-                    marginBottom: "25px"
-                  }}>
-                    ADBRICKS MEDIA is a leading advertisement company based in Chennai, backed by stakeholders with over 20 years of rich industry experience. We are experts in driving business growth by enhancing your revenue and profit through cost-effective strategies.
-                  </p>
-                  <p style={{
-                    lineHeight: "1.8",
-                    color: "#6c757d",
-                    fontSize: "1.1rem"
-                  }}>
-                    Trust ADBRICKS MEDIA to take your business to the next level with tailored solutions that deliver measurable results.
-                  </p>
-                </>
-              )}
-            </div>
-
-            <div style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(4, 1fr)",
-              gap: "20px"
-            }}
-            className="stats-grid">
-              {achievements.map((achievement, index) => (
-                <div key={index} style={{
-                  background: "white",
-                  borderRadius: "15px",
-                  padding: "25px 15px",
-                  textAlign: "center",
-                  boxShadow: "0 8px 25px rgba(0,0,0,0.08)",
-                  border: "1px solid rgba(255,255,255,0.8)",
-                  transition: "transform 0.3s ease"
-                }}>
-                  <div style={{
-                    fontSize: "2rem",
-                    fontWeight: "800",
-                    color: "#3498db",
-                    marginBottom: "8px"
-                  }}>
-                    {achievement.number}
-                  </div>
-                  <div style={{
-                    fontSize: "0.9rem",
-                    color: "#6c757d",
-                    fontWeight: "600"
-                  }}>
-                    {achievement.label}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div style={{
-          background: "linear-gradient(135deg, #2c3e50, #3498db)",
-          borderRadius: "20px",
-          padding: "50px 40px",
-          textAlign: "center",
-          color: "white",
-          position: "relative",
-          overflow: "hidden"
-        }}
-        className="cta-section">
-          <div style={{
-            position: "absolute",
-            top: "-50%",
-            right: "-10%",
-            width: "300px",
-            height: "300px",
-            background: "rgba(255,255,255,0.05)",
-            borderRadius: "50%"
-          }} />
-          <div style={{
-            position: "absolute",
-            bottom: "-30%",
-            left: "-5%",
-            width: "200px",
-            height: "200px",
-            background: "rgba(255,255,255,0.03)",
-            borderRadius: "50%"
-          }} />
-
-          <div style={{ position: "relative", zIndex: 1 }}>
-            <h3 style={{
-              fontSize: "2.2rem",
-              marginBottom: "15px",
-              fontWeight: "700"
-            }}
-            className="header">
-              Ready to Grow Your Business?
-            </h3>
-            <p style={{
-              fontSize: "1.1rem",
-              marginBottom: "30px",
-              opacity: 0.9,
-              maxWidth: "600px",
-              margin: "0 auto 30px"
-            }}>
-              Partner with ADBRICKS MEDIA and experience the difference that 20+ years of expertise can make for your brand.
-            </p>
-            <button style={{
-              background: "white",
-              color: "#2c3e50",
-              border: "none",
-              padding: "15px 35px",
-              borderRadius: "30px",
-              fontSize: "1.1rem",
-              fontWeight: "600",
-              cursor: "pointer",
-              transition: "all 0.3s ease",
-              boxShadow: "0 5px 15px rgba(0,0,0,0.2)"
-            }}
+        className="property-grid">
+          {propertyTypes.map((property, index) => (
+            <div
+              key={index}
+              style={{
+                background: "white",
+                borderRadius: "5px",
+                overflow: "hidden",
+                boxShadow: "0 4px 15px rgba(0,0,0,0.1)",
+                transition: "transform 0.3s ease, box-shadow 0.3s ease",
+                cursor: "pointer",
+                position: "relative"
+              }}
               onMouseEnter={(e) => {
-                e.target.style.transform = "translateY(-2px)";
-                e.target.style.boxShadow = "0 8px 25px rgba(0,0,0,0.3)";
+                e.currentTarget.style.transform = "translateY(-8px)";
+                e.currentTarget.style.boxShadow = "0 8px 25px rgba(0,0,0,0.15)";
               }}
               onMouseLeave={(e) => {
-                e.target.style.transform = "translateY(0)";
-                e.target.style.boxShadow = "0 5px 15px rgba(0,0,0,0.2)";
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.boxShadow = "0 4px 15px rgba(0,0,0,0.1)";
+              }}
+            >
+              <div style={{
+                position: "relative",
+                width: "100%",
+                height: "320px",
+                overflow: "hidden"
               }}>
-              Get Started Today
-            </button>
-          </div>
+                <img
+                  src={property.image}
+                  alt={property.title}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    transition: "transform 0.3s ease"
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.transform = "scale(1.05)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.transform = "scale(1)";
+                  }}
+                />
+                
+                <div style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  background: "rgba(0, 0, 0, 0.4)",
+                  borderRadius: "5px"
+                }} />
+
+                <div style={{
+                  position: "absolute",
+                  bottom: "25px",
+                  // left: "25px",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "10px"
+                }}>
+                  <div style={{
+                    width: "193px",
+                    // height: "35px",
+                    background: property.bgColor,
+                    color: "#000",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    borderRadius: "5px",
+                    fontSize: "0.95rem",
+                    fontWeight: "700",
+                    letterSpacing: "0.5px",
+                    border: "3px solid rgba(255, 255, 255, 0.8)",
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.3)"
+                  }}>
+                    {property.title}
+                  </div>
+
+                  <div style={{
+                    color: "white",
+                    fontSize: "0.95rem",
+                    fontWeight: "600",
+                    textShadow: "0 2px 4px rgba(0,0,0,0.8)",
+                    paddingLeft: "5px"
+                  }}>
+                    {property.projects}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
       <style jsx>{`
-        @media (max-width: 768px) {
-          .main-grid { 
-            grid-template-columns: 1fr !important; 
-            gap: 40px !important;
-          }
-          .stats-grid { 
-            grid-template-columns: repeat(2, 1fr) !important; 
-          }
-          .header { 
-            font-size: 2rem !important; 
-          }
-          .cta-section { 
-            padding: 30px 20px !important; 
+        @media (max-width: 968px) {
+          .property-grid {
+            grid-template-columns: 1fr !important;
+            gap: 25px !important;
           }
         }
-        @media (max-width: 480px) {
-          .stats-grid { 
-            grid-template-columns: 1fr !important; 
+        @media (max-width: 768px) {
+          h2 {
+            font-size: 1.8rem !important;
           }
         }
       `}</style>
@@ -290,4 +178,4 @@ const AboutSection = ({ data }) => {
   );
 };
 
-export default AboutSection;
+export default PropertyTypeSection;
